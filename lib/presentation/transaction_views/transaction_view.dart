@@ -1,11 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/bloc/transaction_bloc/transaction_bloc.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
-import 'package:money_manager/presentation/constants.dart';
 
 class TransactionView extends StatefulWidget {
   DateTime _pickedDate = DateTime.now();
@@ -42,7 +39,7 @@ class _TransactionViewState extends State<TransactionView> {
   },
   builder: (context, state) {
     if(state is LoadingState){
-      return Center(child: CircularProgressIndicator(),);
+      return const Center(child: CircularProgressIndicator(),);
     }else {
       return Scaffold(
         appBar: AppBar(
@@ -50,7 +47,7 @@ class _TransactionViewState extends State<TransactionView> {
         ),
         body: Form(
             child: ListView(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
           children: [
             ListTile(
               leading: const Icon(Icons.currency_rupee),
@@ -92,7 +89,7 @@ class _TransactionViewState extends State<TransactionView> {
               ),
             ),
             ListTile(
-                leading: Icon(Icons.motion_photos_on),
+                leading: const Icon(Icons.motion_photos_on),
                 title: Row(
                   children: [
                     ChoiceChip(
@@ -102,11 +99,11 @@ class _TransactionViewState extends State<TransactionView> {
                           setState((){widget.expense = false;});
                         }
                       },
-                      label: Text("Income"),
+                      label: const Text("Income"),
                     ),
                     ChoiceChip(
                       selected: widget.expense,
-                      label: Text("Expense"),
+                      label: const Text("Expense"),
                       onSelected: (val){
                         if(val){
                           setState(() {
@@ -126,7 +123,7 @@ class _TransactionViewState extends State<TransactionView> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text("Enter what you payed for"),
+                            title: const Text("Enter what you payed for"),
                             content: TextFormField(
                               controller: widget.categoryController,
                             ),
@@ -136,13 +133,13 @@ class _TransactionViewState extends State<TransactionView> {
                                     Navigator.pop(context,
                                         widget.categoryController.text);
                                   },
-                                  child: Text("Ok")),
+                                  child: const Text("Ok")),
                               ElevatedButton(
                                   onPressed: () {
                                     widget.categoryController.clear();
                                     Navigator.pop(context);
                                   },
-                                  child: Text("Cancel")),
+                                  child: const Text("Cancel")),
                             ],
                           );
                         });

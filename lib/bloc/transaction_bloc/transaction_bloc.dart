@@ -7,7 +7,7 @@ part 'transaction_event.dart';
 part 'transaction_state.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
-  ModelRepository _modelRepository;
+  final ModelRepository _modelRepository;
   TransactionBloc(this._modelRepository)
       : super(InitialState()) {
     on<AddTransaction>((AddTransaction event, Emitter<TransactionState> emit) async {
