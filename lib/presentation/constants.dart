@@ -1,0 +1,2 @@
+double? sw;
+double? sh;
