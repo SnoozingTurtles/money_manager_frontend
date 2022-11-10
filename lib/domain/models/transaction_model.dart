@@ -1,23 +1,25 @@
+import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
+
 abstract class Transaction {
-  int amount;
-  String category; //Income category
-  String? note;
+  Amount amount;
+  Category category; //Income category
+  Note? note;
   DateTime dateTime;
   bool recurring;
 
   Transaction(
       {required this.amount,
       required this.category,
-       this.note,
+      this.note,
       required this.dateTime,
       required this.recurring});
 }
 
 class Income extends Transaction {
   Income(
-      {required int amount,
-      required String category,
-      required String note,
+      {required Amount amount,
+      required Category category,
+      Note? note,
       required DateTime dateTime,
       required bool recurring})
       : super(
@@ -31,9 +33,9 @@ class Income extends Transaction {
 class Expense extends Transaction {
   String medium; //account, cash, card
   Expense(
-      {required int amount,
-      required String category,
-      String? note,
+      {required Amount amount,
+      required Category category,
+      Note? note,
       required DateTime dateTime,
       required bool recurring,
       required this.medium})
