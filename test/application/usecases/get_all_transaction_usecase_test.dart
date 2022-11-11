@@ -13,7 +13,7 @@ void main() {
   group('GetAllBooksUseCase', () {
     test('should get empty list when no transactions are found', () async {
       //arrange
-      when(mockTransactionRepository.get()).thenAnswer((_) => []);
+      when(mockTransactionRepository.get()).thenAnswer((_) async=> []);
 
       //act
       var result = await getAllTransactionUseCase.execute();
@@ -27,7 +27,7 @@ void main() {
     //arrange
     var transactions = [MockExpense()];
     when(mockTransactionRepository.get())
-        .thenAnswer((realInvocation) => transactions);
+        .thenAnswer((realInvocation) async=> transactions);
 
     //act
     var result = await getAllTransactionUseCase.execute();

@@ -1,21 +1,32 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:money_manager/application/boundaries/get_all_transactions/get_all_transaction_output.dart';
+import 'package:money_manager/application/boundaries/get_all_transactions/transaction_dto.dart';
+import 'package:money_manager/application/usecases/get_all_transaction_usecase.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
+import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
 import 'package:money_manager/infrastructure/repository/model_repository.dart';
+import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  ModelRepository _modelRepository;
+  final GetAllTransactionUseCase _getAllTransactionUseCase;
 
-  HomeBloc(this._modelRepository) : super(HomeInitial()) {
-    on<LoadTransactionEvent>((event, emit) async{
+  HomeBloc({required ITransactionRepository iTransactionRepository})
+      : _getAllTransactionUseCase = GetAllTransactionUseCase(
+            iTransactionRepository: iTransactionRepository),
+        super(HomeInitial()) {
+    on<LoadTransactionEvent>((event, emit) async {
       emit(HomeLoading());
-      List<Transaction> list = await _modelRepository.getTransactions();
-      emit(HomeLoaded(list));
+      GetAllTransactionOutput getAllTransactionOutput =
+          await _getAllTransactionUseCase.execute();
+      var transactions = getAllTransactionOutput.transactions;
+      emit(HomeLoaded(transactions));
     });
   }
 }

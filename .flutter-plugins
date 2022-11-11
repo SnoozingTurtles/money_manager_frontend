@@ -1,7 +1,8 @@
 # This is a generated file; do not edit or check into version control.
-path_provider=/root/.pub-cache/hosted/pub.dartlang.org/path_provider-2.0.11/
-path_provider_android=/root/.pub-cache/hosted/pub.dartlang.org/path_provider_android-2.0.21/
-path_provider_ios=/root/.pub-cache/hosted/pub.dartlang.org/path_provider_ios-2.0.11/
-path_provider_linux=/root/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.1.7/
-path_provider_macos=/root/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.6/
-path_provider_windows=/root/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.1.3/
+path_provider=/opt/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-2.0.11/
+path_provider_android=/opt/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_android-2.0.21/
+path_provider_ios=/opt/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_ios-2.0.11/
+path_provider_linux=/opt/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.1.7/
+path_provider_macos=/opt/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.6/
+path_provider_windows=/opt/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.1.3/
+sqflite=/opt/flutter/.pub-cache/hosted/pub.dartlang.org/sqflite-2.2.0+3/

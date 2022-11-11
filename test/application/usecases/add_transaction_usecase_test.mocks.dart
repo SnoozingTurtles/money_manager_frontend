@@ -3,8 +3,10 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:async' as _i5;
+
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:money_manager/domain/factory/IEntityFactory.dart' as _i5;
+import 'package:money_manager/domain/factory/IEntityFactory.dart' as _i6;
 import 'package:money_manager/domain/models/transaction_model.dart' as _i2;
 import 'package:money_manager/domain/repositories/ITransactionRepository.dart'
     as _i4;
@@ -78,28 +80,31 @@ class _FakeDateTime_4 extends _i1.SmartFake implements DateTime {
 class MockTransactionRepository extends _i1.Mock
     implements _i4.ITransactionRepository {
   @override
-  void add(_i2.Transaction? transactions) => super.noSuchMethod(
+  _i5.Future<void> add(_i2.Transaction? transactions) => (super.noSuchMethod(
         Invocation.method(
           #add,
           [transactions],
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
   @override
-  List<_i2.Transaction> get() => (super.noSuchMethod(
+  _i5.Future<List<_i2.Transaction>> get() => (super.noSuchMethod(
         Invocation.method(
           #get,
           [],
         ),
-        returnValue: <_i2.Transaction>[],
-        returnValueForMissingStub: <_i2.Transaction>[],
-      ) as List<_i2.Transaction>);
+        returnValue:
+            _i5.Future<List<_i2.Transaction>>.value(<_i2.Transaction>[]),
+        returnValueForMissingStub:
+            _i5.Future<List<_i2.Transaction>>.value(<_i2.Transaction>[]),
+      ) as _i5.Future<List<_i2.Transaction>>);
 }
 
 /// A class which mocks [IEntityFactory].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockEntityFactory extends _i1.Mock implements _i5.IEntityFactory {
+class MockEntityFactory extends _i1.Mock implements _i6.IEntityFactory {
   @override
   _i2.Income newIncome({
     required _i3.Amount? amount,

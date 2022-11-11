@@ -4,9 +4,9 @@ abstract class TransactionEvent extends Equatable{
   const TransactionEvent();
 }
 class AddTransaction extends TransactionEvent{
-  final Expense expense;
-  const AddTransaction({required this.expense});
+  final AddExpenseInput addExpenseInput;
+  const AddTransaction({required this.addExpenseInput});
 
   @override
-  List<Object> get props => [expense];
+  List<Object> get props => [addExpenseInput];
 }
