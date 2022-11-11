@@ -10,7 +10,7 @@ class HomeInitial extends HomeState {
 }
 
 class HomeLoaded extends HomeState {
-  final List<Transaction> transactions;
+  final UnmodifiableListView<TransactionDTO> transactions;
 
   const HomeLoaded(this.transactions);
   @override
