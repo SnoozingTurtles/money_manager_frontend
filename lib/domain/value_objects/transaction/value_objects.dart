@@ -33,8 +33,8 @@ class Category extends Equatable {
 
   factory Category(String value) {
     return Category._(
-      validateSingleLine(value)
-          .flatMap((string) => validateMaxStringLength(string, 10)),
+      validateFieldNotEmpty(value).flatMap((a) => validateSingleLine(value)
+          .flatMap((string) => validateMaxStringLength(string, 10))),
     );
   }
   const Category._(this.value);
