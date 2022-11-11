@@ -2,37 +2,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:money_manager/application/usecases/get_all_transaction_usecase.dart';
 
-import 'add_transaction_usecase.mocks.dart';
+import 'add_transaction_usecase_test.mocks.dart';
 
-void main(){
+void main() {
   var mockTransactionRepository = MockTransactionRepository();
 
-  GetAllTransactionUseCase getAllTransactionUseCase = GetAllTransactionUseCase(iTransactionRepository: mockTransactionRepository);
-  
+  GetAllTransactionUseCase getAllTransactionUseCase = GetAllTransactionUseCase(
+      iTransactionRepository: mockTransactionRepository);
+
   group('GetAllBooksUseCase', () {
-    test('should get empty list when no transactions are found',() async{
+    test('should get empty list when no transactions are found', () async {
       //arrange
-      when(mockTransactionRepository.get()).thenAnswer((_) async=> []);
+      when(mockTransactionRepository.get()).thenAnswer((_) => []);
 
       //act
       var result = await getAllTransactionUseCase.execute();
 
       //assert
-      expect(result.transactions,isEmpty);
+      expect(result.transactions, isEmpty);
     });
-
   });
 
-  test('should return list of transactions',()async{
+  test('should return list of transactions', () async {
     //arrange
     var transactions = [MockExpense()];
-    when(mockTransactionRepository.get()).thenAnswer((realInvocation) async=> transactions);
+    when(mockTransactionRepository.get())
+        .thenAnswer((realInvocation) => transactions);
 
     //act
     var result = await getAllTransactionUseCase.execute();
 
     //assert
-    expect(result.transactions,isNotEmpty);
-
+    expect(result.transactions, isNotEmpty);
   });
 }

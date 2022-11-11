@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/bloc/transaction_bloc/transaction_bloc.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
+import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
 class TransactionView extends StatefulWidget {
   DateTime _pickedDate = DateTime.now();
@@ -153,12 +154,12 @@ class _TransactionViewState extends State<TransactionView> {
                     onPressed: () async {
                       BlocProvider.of<TransactionBloc>(context).add(AddTransaction(
                           expense: Expense(
-                        amount: int.parse(widget.amtController.text),
-                        category: widget.categoryController.text,
+                        amount: Amount(widget.amtController.text),
+                        category: Category(widget.categoryController.text),
                         recurring: false,
                         dateTime: widget._pickedDate,
                         medium: "Cash",
-                        note: widget.noteController.text,
+                        note: Note(widget.noteController.text),
                       )));
                       Navigator.pop(context);
                     },

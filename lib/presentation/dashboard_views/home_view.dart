@@ -14,8 +14,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeBloc, HomeState>(
-      listener: (context, state) {
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         if (state is HomeLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -23,27 +22,27 @@ class _HomeViewState extends State<HomeView> {
           if (state.transactions.isEmpty) {
             return const Center(child: Text("No recent transactions found"));
           } else {
-            return ListView.builder(
-                itemCount: state.transactions.length,
-                itemBuilder: (BuildContext context, int index) {
-                  List<Transaction> transaction = state.transactions;
-                  return ListTile(
-                    title: Text(
-                      transaction[index].category,
-                    ),
-                    trailing: Text(
-                      transaction[index].amount.toString(),
-                    ),
-                    subtitle: Text(
-                      transaction[index].dateTime.toLocal().toString(),
-                    ),
-                  );
-                });
+            return Container();
+            // return ListView.builder(
+            //     itemCount: state.transactions.length,
+            //     itemBuilder: (BuildContext context, int index) {
+            //       List<Transaction> transaction = state.transactions;
+            //       return ListTile(
+            //         title: Text(
+            //           transaction[index].category.value.fold((l) => l, (r) => r),
+            //         ),
+            //         trailing: Text(
+            //           transaction[index].amount.toString(),
+            //         ),
+            //         subtitle: Text(
+            //           transaction[index].dateTime.toLocal().toString(),
+            //         ),
+            //       );
+            //     });
           }
         }
         return const Center(child: Text("Unexpected error occurred"));
       },
     );
   }
-
 }
