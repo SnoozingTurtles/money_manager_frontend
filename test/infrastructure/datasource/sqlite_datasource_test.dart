@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:money_manager/infrastructure/datasource/SqliteDataSource.dart';
+import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
 import 'package:sqflite/sqflite.dart';
 

@@ -15,6 +15,7 @@ class EntityFactory extends IEntityFactory {
         amount: amount,
         category: category,
         dateTime: dateTime,
+        note:note,
         recurring: recurring,
         medium: medium);
   }

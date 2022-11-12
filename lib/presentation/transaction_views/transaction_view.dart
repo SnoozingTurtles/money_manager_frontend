@@ -1,22 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/application/boundaries/add_transaction/add_transaction_input.dart';
-import 'package:money_manager/bloc/transaction_bloc/transaction_bloc.dart';
-import 'package:money_manager/domain/models/transaction_model.dart';
-import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
-
-class TransactionView extends StatefulWidget {
-  DateTime _pickedDate = DateTime.now();
-  TextEditingController amtController = TextEditingController();
-  TextEditingController noteController = TextEditingController();
-  TextEditingController categoryController = TextEditingController();
-  static const String route = "transaction_view";
-  TransactionView({Key? key}) : super(key: key);
-  bool expense = true;
-  @override
-  State<TransactionView> createState() => _TransactionViewState();
-}
+import 'package:money_manager/presentation/bloc/transaction_bloc/transaction_bloc.dart';
 
 List<String> months = [
   "January",
@@ -33,16 +18,22 @@ List<String> months = [
   "December",
 ];
 
+class TransactionView extends StatefulWidget {
+  static const String route = "transaction_view";
+  TransactionView({Key? key}) : super(key: key);
+  bool expense = true;
+  @override
+  State<TransactionView> createState() => _TransactionViewState();
+}
+
 class _TransactionViewState extends State<TransactionView> {
   final key = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<TransactionBloc, TransactionState>(
-      listener: (context, state) {
-
-      },
+      listener: (context, state) {},
       builder: (context, state) {
-        if (state is LoadingState) {
+        if (state.commiting) {
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -53,23 +44,20 @@ class _TransactionViewState extends State<TransactionView> {
               ),
               body: Form(
                   key: key,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  autovalidateMode: AutovalidateMode.always,
                   child: ListView(
                     padding: const EdgeInsets.all(8),
                     children: [
                       ListTile(
                         leading: const Icon(Icons.currency_rupee),
                         title: TextFormField(
-                          validator: (value) => Amount(value!)
-                              .value
-                              .fold((l) => l.message, (r) => null),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
+                          validator: (_) => state.amount.value.fold((l) => l.message, (r) => null),
+                          onChanged: (value) {
+                            BlocProvider.of<TransactionBloc>(context).add(ChangeAmountEvent(amount: value));
+                          },
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           decoration: mInputDecoration("Expense"),
-                          controller: widget.amtController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                              signed: false, decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),
                         ),
                       ),
                       ListTile(
@@ -78,27 +66,25 @@ class _TransactionViewState extends State<TransactionView> {
                             alignment: Alignment.centerLeft,
                             child: TextButton(
                                 onPressed: () async {
-                                  widget._pickedDate = await showDatePicker(
+                                  var date = await showDatePicker(
                                           context: context,
-                                          initialDate: widget._pickedDate,
-                                          firstDate: DateTime.now().subtract(
-                                              const Duration(days: 360)),
-                                          lastDate: DateTime.now().add(
-                                              const Duration(days: 360))) ??
+                                          initialDate: state.dateTime,
+                                          firstDate: DateTime.now().subtract(const Duration(days: 360)),
+                                          lastDate: DateTime.now().add(const Duration(days: 360))) ??
                                       DateTime.now();
 
-                                  setState(() {});
+                                  BlocProvider.of<TransactionBloc>(context).add(ChangeDateEvent(date: date));
                                 },
-                                child: Text(
-                                    "${widget._pickedDate.day} ${months[widget._pickedDate.month - 1]}")),
+                                child: Text("${state.dateTime.day} ${months[state.dateTime.month - 1]}")),
                           )),
                       ListTile(
                         leading: const Icon(Icons.note),
                         title: TextFormField(
-                          validator: (value) => Note(value!)
-                              .value
-                              .fold((l) => l.message, (r) => null),
-                          controller: widget.noteController,
+                          validator: (_) =>
+                              state.note != null ? state.note!.value.fold((l) => l.message, (r) => null) : null,
+                          onChanged: (value) {
+                            BlocProvider.of<TransactionBloc>(context).add(ChangeNoteEvent(note: value));
+                          },
                           decoration: mInputDecoration("Note"),
                           maxLines: 5,
                           maxLength: 50,
@@ -137,39 +123,36 @@ class _TransactionViewState extends State<TransactionView> {
                         children: [
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    widget.categoryController.text.isEmpty
-                                        ? Colors.red
-                                        : Colors.blue),
+                                backgroundColor: state.category.value.isLeft() ? Colors.red : Colors.blue),
                             onPressed: () async {
+                              var key = GlobalKey<FormState>();
                               await showDialog(
                                   context: context,
-                                  builder: (context) {
+                                  builder: (ctx) {
                                     return Form(
-                                      autovalidateMode: AutovalidateMode.always,
+                                      autovalidateMode: AutovalidateMode.disabled,
                                       child: AlertDialog(
-                                        title: const Text(
-                                            "Enter what you payed for"),
+                                        title: const Text("Enter what you payed for"),
                                         content: TextFormField(
-                                          validator: (value) => Category(value!)
-                                              .value
-                                              .fold((l) => l.message,
-                                                  (r) => null),
-                                          controller: widget.categoryController,
+                                          initialValue: state.category.value.fold((l) => "", (r) => r),
+                                          validator: (value) {
+                                            return state.category.value.fold((l) => l.message, (r) => null);
+                                          },
+                                          onChanged: (value) {
+                                            BlocProvider.of<TransactionBloc>(context)
+                                                .add(ChangeCategoryEvent(category: value));
+                                          },
                                         ),
                                         actions: [
                                           ElevatedButton(
                                               onPressed: () {
-                                                Navigator.pop(
-                                                    context,
-                                                    widget.categoryController
-                                                        .text);
+                                                Navigator.pop(context);
                                               },
                                               child: const Text("Ok")),
                                           ElevatedButton(
                                               onPressed: () {
-                                                widget.categoryController
-                                                    .clear();
+                                                BlocProvider.of<TransactionBloc>(context)
+                                                    .add(ChangeCategoryEvent(category: ""));
                                                 Navigator.pop(context);
                                               },
                                               child: const Text("Cancel")),
@@ -177,34 +160,22 @@ class _TransactionViewState extends State<TransactionView> {
                                       ),
                                     );
                                   });
-                              setState(() {});
                             },
                             child: Text(
-                              widget.categoryController.text.isEmpty
+                              state.category.value.fold((l) => true, (r) => false)
                                   ? "Pick Category"
-                                  : widget.categoryController.text,
+                                  : state.category.value.fold((l) => "", (r) => r),
                             ),
                           ),
                           ElevatedButton(
                               onPressed: () async {
                                 if (key.currentState!.validate() &&
-                                    widget.categoryController.text.isNotEmpty) {
+                                    state.category.value.fold((l) => false, (r) => true)) {
                                   BlocProvider.of<TransactionBloc>(context).add(
-                                    AddTransaction(
-                                      addExpenseInput: AddExpenseInput(
-                                        amount:
-                                            Amount(widget.amtController.text),
-                                        recurring: false,
-                                        dateTime: widget._pickedDate,
-                                        category: Category(
-                                            widget.categoryController.text),
-                                        medium: "Cash",
-                                        note: Note(widget.noteController.text),
-                                      ),
-                                    ),
+                                    AddTransaction(),
                                   );
                                   Navigator.pop(context);
-                                }else if (widget.categoryController.text.isEmpty) {
+                                } else if (state.category.value.fold((l) => true, (r) => false)) {
                                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                     content: Text("Pick a category"),
                                   ));

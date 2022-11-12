@@ -12,24 +12,23 @@ class AddTransactionUseCase implements IAddTransactionUseCase {
   final IEntityFactory _entityFactory;
 
   const AddTransactionUseCase(
-      {required ITransactionRepository transactionRepository,
-      required IEntityFactory entityFactory})
+      {required ITransactionRepository transactionRepository, required IEntityFactory entityFactory})
       : _entityFactory = entityFactory,
         _transactionRepository = transactionRepository;
 
   @override
   Future<Either<Failure, AddTransactionOutput>> execute(AddTransactionInput input) async {
-    Transaction newTransaction = _createTransactionFromInput(input);
-
+    Expense newTransaction = _createTransactionFromInput(input);
     _transactionRepository.add(newTransaction);
     return _buildOutputFromNewTransaction(newTransaction);
   }
 
-  Transaction _createTransactionFromInput(AddTransactionInput input) {
+  Expense _createTransactionFromInput(AddTransactionInput input) {
     return _entityFactory.newExpense(
         amount: input.amount,
         category: input.category,
         dateTime: input.dateTime,
+        note: input.note,
         recurring: input.recurring,
         medium: "Cash");
   }
