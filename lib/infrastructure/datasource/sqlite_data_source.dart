@@ -8,6 +8,11 @@ class SqliteDataSource implements IDatasource {
   @override
   Future<void> addTransaction(TransactionModel model) async {
     // await _db.insert('transaction', model.toMap());
+    if (model is ExpenseModel) {
+      await addExpense(model);
+    } else if (model is IncomeModel) {
+      await addIncome(model);
+    }
   }
 
   @override
@@ -16,14 +21,12 @@ class SqliteDataSource implements IDatasource {
     var listOfMapsIncome = await _db.query('income');
     var listOfMaps = [...listOfMapsIncome, ...listOfMapsExpenses];
     if (listOfMaps.isEmpty) return [];
-
-    return listOfMaps
-        .map<TransactionModel>((map) => ExpenseModel.fromMap(map))
-        .toList();
+    return listOfMaps.map<TransactionModel>((map) => ExpenseModel.fromMap(map)).toList();
   }
 
   @override
   Future<void> addExpense(ExpenseModel expense) async {
+
     await _db.insert('expense', expense.toMap());
   }
 
