@@ -39,9 +39,6 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       emit(state.copyWith(category: Category(event.category)));
     });
     on<ChangeNoteEvent>((event, emit) {
-      print(state.note);
-      print(event.note);
-      print(state.note);
       emit(state.copyWith(note: Note(event.note)));
     });
     on<ChangeDateEvent>((event,emit){
