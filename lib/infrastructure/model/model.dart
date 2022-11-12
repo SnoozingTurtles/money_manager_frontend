@@ -84,7 +84,17 @@ class ExpenseModel extends TransactionModel {
         category: Category(map["category"]),
         dateTime: DateTime.parse(map['dateTime']),
         recurring: bool.fromEnvironment(map['recurring']),
-        note: Note(map['note']));
+        note: map['note']==null?null:Note(map['note']));
+  }
+  factory ExpenseModel.fromSpringMap(Map<String, dynamic> map) {
+    print(map);
+    return ExpenseModel(
+        medium: map["type"]??"Cash",
+        amount: Amount("${map["amount"]}"),
+        category: Category("${map["category"]}"),
+        dateTime: DateTime.parse("${map['dateAdded']}"),
+        recurring: bool.fromEnvironment("false"),
+        note: map['description']==null?null:Note(map['description']!));
   }
 
   Map<String, dynamic> toMap() {
@@ -95,6 +105,16 @@ class ExpenseModel extends TransactionModel {
       "recurring": recurring.toString(),
       "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
       "medium": medium.toString(),
+    };
+  }
+  Map<String, dynamic> toSpringMap() {
+    return {
+      "amount": amount.value.fold((l) => null, (r) => r),
+      "category": category.value.fold((l) => null, (r) => r),
+      "dateAdded": dateTime.toIso8601String(),
+      // "recurring": recurring.toString(),
+      "description": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "type": medium.toString(),
     };
   }
 }
