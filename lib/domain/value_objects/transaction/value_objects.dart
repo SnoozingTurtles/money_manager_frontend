@@ -33,7 +33,7 @@ class Category extends Equatable {
 
   factory Category(String value) {
     return Category._(
-      validateFieldNotEmpty(value).flatMap((a) => validateSingleLine(value)
+      validateFieldNotEmpty(value).flatMap((a) => validateSingleLine(a)
           .flatMap((string) => validateMaxStringLength(string, 10))),
     );
   }

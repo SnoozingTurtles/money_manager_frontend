@@ -2,7 +2,7 @@ import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
 
-List<Transaction> transactions = [ExpenseModel.fromMap(map),ExpenseModel.fromMap(map2)];
+
 var map = {
   "amount": "200",
   "category": "food",
@@ -20,7 +20,7 @@ var map2 = {
   "medium": "cash",
 };
 class FakeTransactionRepository implements ITransactionRepository{
-
+  static List<Transaction> transactions = [ExpenseModel.fromMap(map),ExpenseModel.fromMap(map2)];
 
   @override
   Future<void> add(Transaction transaction) async{

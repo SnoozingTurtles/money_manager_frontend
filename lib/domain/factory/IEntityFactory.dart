@@ -4,7 +4,7 @@ import 'package:money_manager/domain/value_objects/transaction/value_objects.dar
 abstract class IEntityFactory{
   Income newIncome({
     required Amount amount,
-    Note note,
+    Note? note,
     required Category category,
     required DateTime dateTime,
     required bool recurring
@@ -12,7 +12,7 @@ abstract class IEntityFactory{
 
   Expense newExpense({
     required Amount amount,
-    Note note,
+    Note? note,
     required Category category,
     required DateTime dateTime,
     required bool recurring,

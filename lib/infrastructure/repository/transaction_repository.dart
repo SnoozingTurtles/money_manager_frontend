@@ -15,6 +15,7 @@ class TransactionRepository implements ITransactionRepository {
           category: transaction.category,
           dateTime: transaction.dateTime,
           recurring: transaction.recurring,
+          note:transaction.note,
           medium: transaction.medium);
     } else {
       model = IncomeModel(
@@ -29,6 +30,7 @@ class TransactionRepository implements ITransactionRepository {
 
   @override
   Future<List<Transaction>> get() async {
-    return await _datasource.get();
+    var value = await _datasource.get();
+    return value;
   }
 }

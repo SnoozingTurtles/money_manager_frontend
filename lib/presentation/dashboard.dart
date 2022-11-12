@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/bloc/home_bloc/home_bloc.dart';
+import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 import 'package:money_manager/presentation/constants.dart';
 import 'package:money_manager/presentation/dashboard_views/home_view.dart';
 import 'package:money_manager/presentation/dashboard_views/stats_view.dart';

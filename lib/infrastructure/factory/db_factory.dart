@@ -20,27 +20,27 @@ class DatabaseFactory {
   _createExpenseTable(Database db) async {
     await db
         .execute("""CREATE TABLE expense(
-    amount TEXT PRIMARY KEY,
+    amount TEXT ,
     category TEXT,
     note TEXT,
     dateTime TEXT,
     recurring TEXT,
-    medium TEXT,
-    )""")
+    medium TEXT
+    );""")
         .then((_) => print('creating expense table....'))
         .catchError(
             (onError) => print('error creating expense table $onError'));
   }
 
   _createIncomeTable(Database db) async {
-    await db
+     await db
         .execute("""CREATE TABLE income(
     amount TEXT PRIMARY KEY,
     category TEXT,
     note TEXT,
     dateTime TEXT,
-    recurring TEXT,
-    )""")
+    recurring TEXT
+    );""")
         .then((_) => print('creating income table....'))
         .catchError((onError) => print('error creating income table $onError'));
   }

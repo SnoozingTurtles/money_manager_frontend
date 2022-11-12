@@ -3,8 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/application/boundaries/get_all_transactions/transaction_dto.dart';
-import 'package:money_manager/bloc/home_bloc/home_bloc.dart';
-import 'package:money_manager/domain/models/transaction_model.dart';
+import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -37,7 +36,7 @@ class _HomeViewState extends State<HomeView> {
                       transaction[index].amount.value.fold((l) => "Error", (r) => r),
                     ),
                     subtitle: Text(
-                      transaction[index].dateTime.toLocal().toString(),
+                      transaction[index].note!=null?transaction[index].note!.value.fold((l) => "null", (r) =>r):"null",
                     ),
                   );
                 });
