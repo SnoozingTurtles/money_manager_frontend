@@ -14,7 +14,7 @@ class GetAllTransactionUseCase implements IGetAllTransactionUseCase {
 
   @override
   Future<GetAllTransactionOutput> execute() async {
-    var transactions = await _transactionRepository.get();
+    var transactions = await _transactionRepository.getLocal();
     List<ExpenseDTO> output = transactions
         .map((transaction) => ExpenseDTO.fromEntity(transaction))
         .toList();

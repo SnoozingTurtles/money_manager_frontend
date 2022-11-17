@@ -1,18 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:money_manager/common/connectivity.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:money_manager/infrastructure/datasource/IDatasource.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 
-@GenerateNiceMocks([MockSpec<IDatasource>(as:#MockDataSource)])
+@GenerateNiceMocks([MockSpec<IDatasource>(as: #MockDataSource)])
 import 'transaction_repository_test.mocks.dart';
+
 void main() {
   MockDataSource mockDatasource = MockDataSource();
 
-  TransactionRepository sut = TransactionRepository(datasource: mockDatasource);
+  TransactionRepository sut = TransactionRepository(
+      localDatasource: mockDatasource, remoteDatasource: mockDatasource, connectivity: ConnectivitySingleton());
 
   group('TransactionRepository.add', () {
     //arrange
@@ -21,15 +24,9 @@ void main() {
     var note = Note("note");
     var dateTime = DateTime.now();
 
-    var expense = Expense(
-        amount: amount,
-        category: category,
-        dateTime: dateTime,
-        recurring: false,
-        medium: "medium");
+    var expense = Expense(amount: amount, category: category, dateTime: dateTime, recurring: false, medium: "medium");
 
-    test('should add a transaction when call to the datasource is succesfull',
-        () async {
+    test('should add a transaction when call to the datasource is succesfull', () async {
       //act
       await sut.add(expense);
       //assert
@@ -38,9 +35,7 @@ void main() {
   });
 
   group('TransactionRepository.getAll()', () {
-    test(
-        'should return a list of transactions when the call to the datasource is successful',
-        () async {
+    test('should return a list of transactions when the call to the datasource is successful', () async {
       //arrange
       var map = {
         "amount": "2",
@@ -50,8 +45,7 @@ void main() {
         "recurring": "false",
         "medium": "cash",
       };
-      when(mockDatasource.get())
-          .thenAnswer((_) async => [ExpenseModel.fromMap(map)]);
+      when(mockDatasource.get()).thenAnswer((_) async => [ExpenseModel.fromMap(map)]);
 
       //act
       var transaction = await sut.get();

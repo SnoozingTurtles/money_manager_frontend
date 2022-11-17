@@ -73,6 +73,14 @@ class _TransactionViewState extends State<TransactionView> {
                                           lastDate: DateTime.now().add(const Duration(days: 360))) ??
                                       DateTime.now();
 
+                                  date = date.add(Duration(
+                                      hours: DateTime.now().hour,
+                                      minutes: DateTime.now().minute,
+                                      seconds: DateTime.now().second,
+                                      milliseconds: DateTime.now().millisecond));
+                                  
+                                  
+                                  debugPrint(date.toIso8601String());
                                   BlocProvider.of<TransactionBloc>(context).add(ChangeDateEvent(date: date));
                                 },
                                 child: Text("${state.dateTime.day} ${months[state.dateTime.month - 1]}")),

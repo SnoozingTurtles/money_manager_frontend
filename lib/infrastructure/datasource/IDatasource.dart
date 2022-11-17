@@ -4,7 +4,7 @@ abstract class IDatasource{
   Future<void> addTransaction(TransactionModel model);
   Future<void> addExpense(ExpenseModel expense);
   Future<void> addIncome(IncomeModel income);
-
   Future<List<TransactionModel>> get();
-
+  Future<List<IncomeModel>> getIncome();
+  Future<List<ExpenseModel>> getExpense();
 }

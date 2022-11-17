@@ -11,13 +11,19 @@ class HomeInitial extends HomeState {
 
 class HomeLoaded extends HomeState {
   final UnmodifiableListView<TransactionDTO> transactions;
+  final bool syncLoading;
+  const HomeLoaded({required this.transactions,required this.syncLoading});
 
-  const HomeLoaded(this.transactions);
+  HomeLoaded copyWith({bool? syncLoading}) {
+    return HomeLoaded(transactions:transactions,syncLoading: syncLoading ?? this.syncLoading);
+  }
+
   @override
-  List<Object?> get props => [transactions];
+  List<Object?> get props => [syncLoading];
 }
 
 class HomeLoading extends HomeState {
   @override
   List<Object> get props => [];
 }
+

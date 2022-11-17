@@ -44,7 +44,15 @@ class IncomeModel extends TransactionModel {
         recurring: bool.fromEnvironment(map['recurring']),
         note: Note(map['note']));
   }
-
+  factory IncomeModel.fromSpringMap(Map<String, dynamic> map) {
+    print(Amount("${map["amount"]}"));
+    return IncomeModel(
+        amount: Amount("${map["amount"]}"),
+        category: Category("${map["category"]}"),
+        dateTime: DateTime.parse("${map['dateAdded']}"),
+        recurring: bool.fromEnvironment("false"),
+        note: map['description']==null?null:Note(map['description']!));
+  }
   Map<String, dynamic> toMap() {
     return {
       "amount": amount.value.fold((l) => null, (r) => r),
@@ -54,6 +62,18 @@ class IncomeModel extends TransactionModel {
       "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
     };
   }
+
+  Map<String, dynamic> toBufferMap(){
+    return {
+      "amount": amount.value.fold((l) => null, (r) => r),
+      "category": category.value.fold((l) => null, (r) => r),
+      "dateTime": dateTime.toIso8601String(),
+      "recurring": recurring.toString(),
+      "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "transactionType":"income",
+    };
+  }
+
 }
 
 class ExpenseModel extends TransactionModel {
@@ -78,16 +98,17 @@ class ExpenseModel extends TransactionModel {
   }
 
   factory ExpenseModel.fromMap(Map<String, dynamic> map) {
+    print(map);
     return ExpenseModel(
-        medium: map["medium"],
+        medium: map["medium"]??"Cash",
         amount: Amount(map["amount"]),
         category: Category(map["category"]),
         dateTime: DateTime.parse(map['dateTime']),
         recurring: bool.fromEnvironment(map['recurring']),
         note: map['note']==null?null:Note(map['note']));
   }
+
   factory ExpenseModel.fromSpringMap(Map<String, dynamic> map) {
-    print(map);
     return ExpenseModel(
         medium: map["type"]??"Cash",
         amount: Amount("${map["amount"]}"),
@@ -115,6 +136,18 @@ class ExpenseModel extends TransactionModel {
       // "recurring": recurring.toString(),
       "description": note != null ? note!.value.fold((l) => null, (r) => r) : null,
       "type": medium.toString(),
+    };
+  }
+
+  Map<String, dynamic> toBufferMap(){
+    return {
+      "amount": amount.value.fold((l) => null, (r) => r),
+      "category": category.value.fold((l) => null, (r) => r),
+      "dateTime": dateTime.toIso8601String(),
+      "recurring": recurring.toString(),
+      "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "medium": medium.toString(),
+      "transactionType": "expense"
     };
   }
 }

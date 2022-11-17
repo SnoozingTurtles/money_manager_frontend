@@ -9,3 +9,9 @@ class LoadTransactionEvent extends HomeEvent{
   @override
   List<Object?> get props => [];
 }
+class SyncTransactionEvent extends HomeEvent{
+  const SyncTransactionEvent();
+
+  @override
+  List<Object?> get props => [];
+}
