@@ -14,8 +14,8 @@ class SpringBootDataSource implements IDatasource {
   @override
   Future<void> addIncome(IncomeModel income) async {
     Dio dio = Dio();
-    Map<String, dynamic> map = income.toMap();
-    await dio.post("https://money-manager-snoozingturtle.herokuapp.com/api/user/1/expenses", data: map);
+    Map<String, dynamic> map = income.toSpringMap();
+    await dio.post("https://money-manager-snoozingturtle.herokuapp.com/api/user/1/incomes", data: map);
   }
 
   @override
@@ -87,6 +87,8 @@ class SpringBootDataSource implements IDatasource {
           "dateAdded": transaction['dateTime'],
           "description": transaction['note'],
         };
+        await dio.post("https://money-manager-snoozingturtle.herokuapp.com/api/user/1/incomes", data: map);
+
       }
     }
   }
