@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/presentation/bloc/transaction_bloc/transaction_bloc.dart';
 
+import '../bloc/user_bloc/user_bloc.dart';
+
 List<String> months = [
   "January",
   "February",
@@ -78,8 +80,7 @@ class _TransactionViewState extends State<TransactionView> {
                                       minutes: DateTime.now().minute,
                                       seconds: DateTime.now().second,
                                       milliseconds: DateTime.now().millisecond));
-                                  
-                                  
+
                                   debugPrint(date.toIso8601String());
                                   BlocProvider.of<TransactionBloc>(context).add(ChangeDateEvent(date: date));
                                 },
@@ -103,26 +104,18 @@ class _TransactionViewState extends State<TransactionView> {
                           title: Row(
                             children: [
                               ChoiceChip(
-                                selected: !widget.expense,
+                                selected: state.income,
                                 onSelected: (val) {
-                                  if (val) {
-                                    setState(() {
-                                      widget.expense = false;
-                                    });
-                                  }
+                                  BlocProvider.of<TransactionBloc>(context).add(FlipIncome());
                                 },
                                 label: const Text("Income"),
                               ),
                               ChoiceChip(
-                                selected: widget.expense,
+                                selected: !state.income,
                                 label: const Text("Expense"),
-                                onSelected: (val) {
-                                  if (val) {
-                                    setState(() {
-                                      widget.expense = true;
-                                    });
-                                  }
-                                },
+                                  onSelected: (val) {
+                                    BlocProvider.of<TransactionBloc>(context).add(FlipExpense());
+                                  },
                               ),
                             ],
                           )),
@@ -180,7 +173,7 @@ class _TransactionViewState extends State<TransactionView> {
                                 if (key.currentState!.validate() &&
                                     state.category.value.fold((l) => false, (r) => true)) {
                                   BlocProvider.of<TransactionBloc>(context).add(
-                                    AddTransaction(),
+                                    AddTransaction(id: state.uid),
                                   );
                                   Navigator.pop(context);
                                 } else if (state.category.value.fold((l) => true, (r) => false)) {

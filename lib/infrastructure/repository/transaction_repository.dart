@@ -5,27 +5,33 @@ import 'package:money_manager/infrastructure/datasource/spring_data_source.dart'
 import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
 
+import '../../domain/value_objects/transaction/value_objects.dart';
+
 class TransactionRepository implements ITransactionRepository {
   final SqliteDataSource _localDatasource;
   final SpringBootDataSource _remoteDatasource;
   final ConnectivitySingleton _connectivity;
   TransactionRepository(
-      {required SqliteDataSource localDatasource, required SpringBootDataSource remoteDatasource, required ConnectivitySingleton connectivity})
+      {required SqliteDataSource localDatasource,
+      required SpringBootDataSource remoteDatasource,
+      required ConnectivitySingleton connectivity})
       : _localDatasource = localDatasource,
         _remoteDatasource = remoteDatasource,
         _connectivity = connectivity;
 
-  Stream<bool> get connectivityStream  => _connectivity.connectionChange;
+  Stream<bool> get connectivityStream => _connectivity.connectionChange;
 
-  void dispose(){
+  void dispose() {
     _connectivity.dispose();
   }
+
   @override
-  Future<void> add(Transaction transaction) async {
+  Future<void> add(Transaction transaction, UserId id) async {
     //create DTO model for infra layer from incoming transaction.
     TransactionModel model;
     if (transaction is Expense) {
       model = ExpenseModel(
+          id: id,
           amount: transaction.amount,
           category: transaction.category,
           dateTime: transaction.dateTime,
@@ -34,17 +40,19 @@ class TransactionRepository implements ITransactionRepository {
           medium: transaction.medium);
     } else {
       model = IncomeModel(
+        id: id,
         amount: transaction.amount,
         category: transaction.category,
         dateTime: transaction.dateTime,
         recurring: transaction.recurring,
+        note: transaction.note,
       );
     }
     //connectivity
-    if(_connectivity.hasConnection){
+    if (_connectivity.hasConnection) {
       await _localDatasource.addTransaction(model);
       return await _remoteDatasource.addTransaction(model);
-    }else{
+    } else {
       await _localDatasource.addBuffer(model);
       return await _localDatasource.addTransaction(model);
     }
@@ -57,20 +65,20 @@ class TransactionRepository implements ITransactionRepository {
   }
 
   @override
-  Future<List<TransactionModel>> getRemote()async{
+  Future<List<TransactionModel>> getRemote() async {
     return _remoteDatasource.get();
   }
 
   @override
-  Future<List<Map<String,Object?>>> getBuffer() async{
+  Future<List<Map<String, Object?>>> getBuffer() async {
     return await _localDatasource.getBuffer();
   }
 
   @override
-  Future<void> syncRemoteToLocal()async{
+  Future<void> syncRemoteToLocal() async {
     var map = await _remoteDatasource.get();
     print("remote to local map: $map");
-    if(map.isNotEmpty){
+    if (map.isNotEmpty) {
       for (var element in map) {
         _localDatasource.addTransaction(element);
       }
@@ -78,7 +86,7 @@ class TransactionRepository implements ITransactionRepository {
   }
 
   @override
-  Future<void> syncLocalToRemote()async{
+  Future<void> syncLocalToRemote() async {
     var map = await getBuffer();
     print("Check empty buffer");
     print(map);

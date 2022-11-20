@@ -1,6 +1,7 @@
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
 abstract class AddTransactionInput {
+  UserId id;
   Amount amount;
   Category category; //AddIncomeInput category
   Note? note;
@@ -9,6 +10,7 @@ abstract class AddTransactionInput {
 
   AddTransactionInput(
       {required this.amount,
+        required this.id,
         required this.category,
         this.note,
         required this.dateTime,
@@ -18,12 +20,14 @@ abstract class AddTransactionInput {
 class AddIncomeInput extends AddTransactionInput {
   AddIncomeInput(
       {required Amount amount,
+        required UserId id,
         required Category category,
         Note? note,
         required DateTime dateTime,
         required bool recurring})
       : super(
       amount: amount,
+      id:id,
       category: category,
       dateTime: dateTime,
       note: note,
@@ -36,11 +40,13 @@ class AddExpenseInput extends AddTransactionInput {
       {required Amount amount,
         required Category category,
         Note? note,
+        required UserId id,
         required DateTime dateTime,
         required bool recurring,
         required this.medium})
       : super(
       amount: amount,
+      id:id,
       category: category,
       dateTime: dateTime,
       note: note,

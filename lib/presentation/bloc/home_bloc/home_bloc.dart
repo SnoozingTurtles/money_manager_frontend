@@ -7,7 +7,6 @@ import 'package:money_manager/application/boundaries/get_all_transactions/get_al
 import 'package:money_manager/application/boundaries/get_all_transactions/transaction_dto.dart';
 import 'package:money_manager/application/usecases/get_all_transaction_usecase.dart';
 import 'package:money_manager/application/usecases/sync_transaction_usecase.dart';
-import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 
 part 'home_event.dart';

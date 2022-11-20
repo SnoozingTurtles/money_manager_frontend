@@ -1,7 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:money_manager/infrastructure/datasource/spring_data_source.dart';
-import 'package:money_manager/infrastructure/model/model.dart';
-import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -15,11 +12,21 @@ class DatabaseFactory {
     return database;
   }
   void populateDb(Database db, int version) async {
+    await _createUserTable(db);
     await _createExpenseTable(db);
     await _createIncomeTable(db);
     await _createBufferTable(db);
   }
 
+  _createUserTable(Database db) async{
+    await db.execute("""CREATE TABLE user(
+    userId INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    balance NUMERIC,
+    expense NUMERIC,
+    income NUMERIC
+    );""");
+  }
   _createExpenseTable(Database db) async {
     await db
         .execute("""CREATE TABLE expense(
@@ -28,7 +35,9 @@ class DatabaseFactory {
     note TEXT,
     dateTime TEXT,
     recurring TEXT,
-    medium TEXT
+    medium TEXT,
+    userId INTEGER,
+    FOREIGN KEY(userId) REFERENCES user(userId)
     );""")
         .then((_) => print('creating expense table....'))
         .catchError(
@@ -40,11 +49,13 @@ class DatabaseFactory {
   _createIncomeTable(Database db) async {
      await db
         .execute("""CREATE TABLE income(
-    amount TEXT PRIMARY KEY,
+    amount TEXT,
     category TEXT,
     note TEXT,
     dateTime TEXT,
-    recurring TEXT
+    recurring TEXT,
+    userId INTEGER,
+    FOREIGN KEY(userId) REFERENCES user(userId)
     );""")
         .then((_) => print('creating income table....'))
         .catchError((onError) => print('error creating income table $onError'));
@@ -58,7 +69,9 @@ class DatabaseFactory {
     dateTime TEXT,
     recurring TEXT,
     medium TEXT,
-    transactionType TEXT
+    transactionType TEXT,
+    userId INTEGER,
+    FOREIGN KEY(userId) REFERENCES user(userId)
     );""");
   }
   dropAllTables(Database db) async {

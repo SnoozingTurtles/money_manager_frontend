@@ -14,6 +14,7 @@ part of 'transaction_bloc.dart';
 // }
 
 class TransactionState extends Equatable {
+  final UserId uid;
   final Amount amount;
   final Category category;
   final Note? note;
@@ -22,9 +23,12 @@ class TransactionState extends Equatable {
   final bool recurring;
   final String error;
   final bool commiting;
+  final bool income;
 
   const TransactionState(
       {required this.amount,
+      required this.uid,
+      required this.income,
       required this.category,
       this.note,
       required this.dateTime,
@@ -33,11 +37,13 @@ class TransactionState extends Equatable {
       required this.error,
       required this.commiting});
 
-  factory TransactionState.initial() {
+  factory TransactionState.initial(UserId id) {
     return TransactionState(
         amount: Amount(""),
         category: Category(""),
+        income: false,
         dateTime: DateTime.now(),
+        uid: id,
         medium: "Cash",
         recurring: false,
         error: "",
@@ -45,8 +51,8 @@ class TransactionState extends Equatable {
   }
   @override
   List<Object> get props => note == null
-      ? [amount, category, dateTime, medium, recurring]
-      : [amount, category, dateTime, medium, recurring, note!];
+      ? [amount, category, dateTime, medium, recurring,income]
+      : [amount, category, dateTime, medium, recurring, note!,income];
 
   TransactionState copyWith(
       {Amount? amount,
@@ -56,8 +62,11 @@ class TransactionState extends Equatable {
       String? medium,
       bool? recurring,
       String? error,
+      bool? income,
       bool? commiting}) {
     return TransactionState(
+      income: income ?? this.income,
+      uid: uid,
       amount: amount ?? this.amount,
       category: category ?? this.category,
       note: note ?? this.note,

@@ -1,8 +1,10 @@
+import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:money_manager/infrastructure/datasource/IDatasource.dart';
+import 'package:money_manager/infrastructure/datasource/i_user_data_source.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SqliteDataSource implements IDatasource {
+class SqliteDataSource implements IDatasource, IUserDataSource {
   final Database _db;
   const SqliteDataSource({required Database db}) : _db = db;
   @override
@@ -26,43 +28,79 @@ class SqliteDataSource implements IDatasource {
 
   @override
   Future<void> addExpense(ExpenseModel expense) async {
-
     await _db.insert('expense', expense.toMap());
+    double expenseAmount = expense.amount.value.fold((l) => 0, (r) => double.parse(r));
+    UserModel user = await getUser(expense.id);
+    await _db.update('user', {"balance": (user.balance - expenseAmount),'expense':(user.expense+expenseAmount)},
+        where: "userId = ?", whereArgs: [expense.id.value]);
   }
 
   @override
   Future<void> addIncome(IncomeModel income) async {
     await _db.insert('income', income.toMap());
+    double incomeAmount = income.amount.value.fold((l) => 0, (r) => double.parse(r));
+    UserModel user = await getUser(income.id);
+    await _db.update('user', {"balance": (user.balance + incomeAmount),'income':(user.income+incomeAmount)},
+        where: "userId = ?", whereArgs: [income.id.value]);
   }
 
-  Future<void> addBuffer(TransactionModel transaction) async{
-    if(transaction is IncomeModel){
-      await _db.insert('buffer',transaction.toBufferMap());
-    }else if(transaction is ExpenseModel){
+  Future<void> addBuffer(TransactionModel transaction) async {
+    if (transaction is IncomeModel) {
+      await _db.insert('buffer', transaction.toBufferMap());
+    } else if (transaction is ExpenseModel) {
       await _db.insert('buffer', transaction.toBufferMap());
     }
   }
 
-  Future<List<Map<String,Object?>>> getBuffer() async{
+  Future<List<Map<String, Object?>>> getBuffer() async {
     var lOfMaps = await _db.query('buffer');
-    if(lOfMaps.isEmpty) return [];
+    if (lOfMaps.isEmpty) return [];
 
     return lOfMaps;
   }
-  Future<void> clearBuffer()async{
+
+  Future<void> clearBuffer() async {
     await _db.delete('buffer');
   }
 
-
   @override
-  Future<List<ExpenseModel>> getExpense()async {
+  Future<List<ExpenseModel>> getExpense() async {
     var listOfMapsExpenses = await _db.query('expense');
-  return listOfMapsExpenses.map<ExpenseModel>((map) => ExpenseModel.fromMap(map)).toList();
+    return listOfMapsExpenses.map<ExpenseModel>((map) => ExpenseModel.fromMap(map)).toList();
   }
 
   @override
-  Future<List<IncomeModel>> getIncome()async {
+  Future<List<IncomeModel>> getIncome() async {
     var listOfMapIncome = await _db.query('income');
     return listOfMapIncome.map<IncomeModel>((map) => IncomeModel.fromMap(map)).toList();
+  }
+
+  @override
+  Future<int> addUser(UserModel user) {
+    // TODO: implement addUser
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<int> generateUser() async {
+    try {
+      int id = await _db.insert('user', {'name': 'Mihir', 'balance': 0,'expense':0,'income':0});
+      print("Generated id  is $id");
+      return id;
+    } catch (e) {
+      print(e);
+      return 0;
+    }
+  }
+
+  @override
+  Future<UserModel> getUser(UserId id) async {
+    final value = await _db.query('user', where: "userId = ?", whereArgs: [id.value]);
+    return UserModel(
+      userId: UserId(value[0]['userId'] as int),
+      balance: double.parse("${value[0]['balance']}"),
+      income: double.parse("${value[0]['income']}"),
+      expense: double.parse("${value[0]['expense']}"),
+    );
   }
 }

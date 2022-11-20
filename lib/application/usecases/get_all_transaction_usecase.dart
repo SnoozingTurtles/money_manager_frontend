@@ -4,6 +4,7 @@ import 'package:money_manager/application/boundaries/get_all_transactions/IGetAl
 import 'package:money_manager/application/boundaries/get_all_transactions/get_all_transaction_output.dart';
 import 'package:money_manager/application/boundaries/get_all_transactions/transaction_dto.dart';
 import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
+import 'package:money_manager/infrastructure/model/model.dart';
 
 class GetAllTransactionUseCase implements IGetAllTransactionUseCase {
   final ITransactionRepository _transactionRepository;
@@ -15,8 +16,11 @@ class GetAllTransactionUseCase implements IGetAllTransactionUseCase {
   @override
   Future<GetAllTransactionOutput> execute() async {
     var transactions = await _transactionRepository.getLocal();
-    List<ExpenseDTO> output = transactions
-        .map((transaction) => ExpenseDTO.fromEntity(transaction))
+    List<TransactionDTO> output = transactions
+        .map((transaction) {
+          print(transaction);
+          return transaction is ExpenseModel? ExpenseDTO.fromEntity(transaction):IncomeDTO.fromEntity(transaction);
+        })
         .toList();
     return GetAllTransactionOutput(transactions: UnmodifiableListView(output));
   }
