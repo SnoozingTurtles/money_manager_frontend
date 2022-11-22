@@ -23,7 +23,7 @@ class EntityFactory extends IEntityFactory {
       required Category category,
       required DateTime dateTime,
       required bool recurring}) {
-    return Income(amount: amount, category: category, dateTime: dateTime, recurring: recurring);
+    return Income(amount: amount,note: note, category: category, dateTime: dateTime, recurring: recurring);
   }
 
   @override
