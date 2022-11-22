@@ -15,6 +15,7 @@ abstract class TransactionDTO extends Equatable{
         this.note,
         required this.dateTime,
         required this.recurring});
+
 }
 
 class IncomeDTO extends TransactionDTO {

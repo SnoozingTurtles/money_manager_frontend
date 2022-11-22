@@ -10,7 +10,7 @@ class HomeInitial extends HomeState {
 }
 
 class HomeLoaded extends HomeState {
-  final UnmodifiableListView<TransactionDTO> transactions;
+  final SplayTreeMap<String,List<TransactionDTO>> transactions;
   final bool syncLoading;
   const HomeLoaded({required this.transactions,required this.syncLoading});
 

@@ -49,6 +49,7 @@ class AddTransactionUseCase implements IAddTransactionUseCase {
         amount: input.amount,
         category: input.category,
         dateTime: input.dateTime,
+        note:input.note,
         recurring: input.recurring,
         medium: "Cash");
     }else{
@@ -56,6 +57,7 @@ class AddTransactionUseCase implements IAddTransactionUseCase {
         amount: input.amount,
         category: input.category,
         dateTime: input.dateTime,
+        note: input.note,
         recurring: input.recurring,
       );
     }

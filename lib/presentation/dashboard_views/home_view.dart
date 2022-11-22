@@ -1,13 +1,8 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/application/boundaries/get_all_transactions/transaction_dto.dart';
-import 'package:money_manager/infrastructure/repository/model_repository.dart';
-import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 
-import '../../infrastructure/repository/user_repository.dart';
 import '../bloc/user_bloc/user_bloc.dart';
 import '../constants.dart';
 
@@ -25,13 +20,6 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
   }
-
-  // @override
-  // void dispose() {
-  //   print('disposing stream');
-  //   RepositoryProvider.of<TransactionRepository>(context).dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +39,8 @@ class _HomeViewState extends State<HomeView> {
                 if (state.transactions.isEmpty) {
                   return const Center(child: Text("No recent transactions found"));
                 } else {
+                  List<String> dateTime = state.transactions.keys.toList().reversed.toList();
+                  List<List<TransactionDTO>> transaction = state.transactions.values.toList().reversed.toList();
                   return SafeArea(
                     child: Column(
                       children: [
@@ -85,33 +75,54 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         Expanded(
                           child: ListView.builder(
-                            itemCount: state.transactions.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              UnmodifiableListView<TransactionDTO> transaction = state.transactions;
-                              print(transaction[index].toString());
-                              return ListTile(
-                                title: Text(
-                                  transaction[index].category.value.fold((l) => "Error", (r) => r),
-                                ),
-                                trailing: SizedBox(
-                                  width:sw!*1/5,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        transaction[index].amount.value.fold((l) => "Error", (r) => r),
-                                      ),
-                                      transaction[index] is IncomeDTO? Icon(Icons.arrow_upward,color: Colors.green,):Icon(Icons.arrow_downward,color: Colors.red,)
-                                    ],
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  transaction[index].note != null
-                                      ? transaction[index].note!.value.fold((l) => "null", (r) => r)
-                                      : "null",
-                                ),
-                              );
-                            },
-                          ),
+                              itemCount: dateTime.length,
+                              itemBuilder: (context, dIndex) {
+                                return Column(
+                                  children: [
+                                    Text(dateTime[dIndex].toString()),
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: transaction[dIndex].length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        print("Second buildView ${transaction[dIndex]}");
+                                        return ListTile(
+                                          title: Text(
+                                            transaction[dIndex][index].category.value.fold((l) => "Error", (r) => r),
+                                          ),
+                                          trailing: SizedBox(
+                                            width: sw! * 1 / 5,
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  transaction[dIndex][index]
+                                                      .amount
+                                                      .value
+                                                      .fold((l) => "Error", (r) => r),
+                                                ),
+                                                transaction[dIndex][index] is IncomeDTO
+                                                    ? const Icon(
+                                                        Icons.arrow_upward,
+                                                        color: Colors.green,
+                                                      )
+                                                    : const Icon(
+                                                        Icons.arrow_downward,
+                                                        color: Colors.red,
+                                                      )
+                                              ],
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            transaction[dIndex][index].note != null
+                                                ? transaction[dIndex][index].note!.value.fold((l) => "null", (r) => r)
+                                                : "null",
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }),
                         ),
                       ],
                     ),
