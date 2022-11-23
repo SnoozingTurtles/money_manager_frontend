@@ -28,7 +28,6 @@ class UserRepository extends IUserRepository{
   @override
   Future<User> get(UserId id) async{
     var val = await _localDatasource.getUser(id);
-    print(val.balance);
     return _entityFactory.newUser(uid:val.userId,balance: val.balance,expense:val.expense,income:val.income);
   }
 }

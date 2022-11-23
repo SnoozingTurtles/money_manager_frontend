@@ -1,6 +1,6 @@
 import 'package:money_manager/common/connectivity.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
-import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
+import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/infrastructure/datasource/spring_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
@@ -59,14 +59,14 @@ class TransactionRepository implements ITransactionRepository {
   }
 
   @override
-  Future<List<Transaction>> getLocal() async {
-    var value = await _localDatasource.get();
+  Future<List<Transaction>> getLocal(String startDate, String endDate) async {
+    var value = await _localDatasource.get(startDate,endDate);
     return value;
   }
 
   @override
-  Future<List<TransactionModel>> getRemote() async {
-    return _remoteDatasource.get();
+  Future<List<TransactionModel>> getRemote(String startDate, String endDate) async {
+    return _remoteDatasource.get(startDate,endDate);
   }
 
   @override
@@ -76,7 +76,8 @@ class TransactionRepository implements ITransactionRepository {
 
   @override
   Future<void> syncRemoteToLocal() async {
-    var map = await _remoteDatasource.get();
+    // var map = await _remoteDatasource.get();
+    List<TransactionModel> map = [];
     print("remote to local map: $map");
     if (map.isNotEmpty) {
       for (var element in map) {

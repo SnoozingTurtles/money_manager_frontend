@@ -40,7 +40,6 @@ class IncomeModel extends TransactionModel {
         note: map['note'] == null ? null : Note(map['note']));
   }
   factory IncomeModel.fromSpringMap(Map<String, dynamic> map) {
-    print(Amount("${map["amount"]}"));
     return IncomeModel(
         id: UserId(1),
         amount: Amount("${map["amount"]}"),
@@ -105,7 +104,6 @@ class ExpenseModel extends TransactionModel {
   }
 
   factory ExpenseModel.fromMap(Map<String, dynamic> map) {
-    print(map);
     return ExpenseModel(
         id: UserId(map["userId"]),
         medium: map["medium"] ?? "Cash",

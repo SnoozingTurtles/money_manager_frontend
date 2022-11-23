@@ -14,7 +14,6 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
-
   final List<Widget> _views = [const HomeView(), const StatsView()];
   int _selectedIndex = 0;
   @override
@@ -22,6 +21,55 @@ class _DashBoardState extends State<DashBoard> {
     sw = MediaQuery.of(context).size.width;
     sh = MediaQuery.of(context).size.height;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("All Time"),
+        actions: [
+          PopupMenuButton(itemBuilder: (context) {
+            return [
+              PopupMenuItem(
+                  child: Text("This Month"),
+                  onTap: () {
+                    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
+                  }),
+              PopupMenuItem(
+                  child: const Text("Last Month"),
+                  onTap: () {
+                    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsLastMonthEvent());
+                  }),
+              PopupMenuItem(
+                  child: const Text("Last 3 Months"),
+                  onTap: () {
+                    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsLast3MonthEvent());
+                  }),
+              PopupMenuItem(
+                  child: const Text("Last 6 Months"),
+                  onTap: () {
+                    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsLast6MonthEvent());
+                  }),
+              PopupMenuItem(
+                  child: const Text("All Time"),
+                  onTap: () {
+                    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionEvent());
+                  }),
+              PopupMenuItem(
+                  child: Text("Custom"),
+                  onTap: () async {
+                    var output = await Future.delayed(
+                        const Duration(seconds: 0),
+                        () async => await showDateRangePicker(
+                              context: context,
+                              firstDate: DateTime.now().subtract(const Duration(days: 360)),
+                              lastDate: DateTime.now().add(const Duration(days: 360)),
+                            ));
+                    if(output != null) {
+                      BlocProvider.of<HomeBloc>(context)
+                        .add(LoadTransactionsCustomEvent(startDate: output.start, endDate: output.end));
+                    }
+                  }),
+            ];
+          }),
+        ],
+      ),
       body: _views[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
@@ -45,7 +93,7 @@ class _DashBoardState extends State<DashBoard> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.pushNamed(context,TransactionView.route);
+          Navigator.pushNamed(context, TransactionView.route);
         },
       ),
     );

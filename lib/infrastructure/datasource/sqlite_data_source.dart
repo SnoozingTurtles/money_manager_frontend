@@ -1,5 +1,5 @@
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
-import 'package:money_manager/infrastructure/datasource/IDatasource.dart';
+import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/i_user_data_source.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -18,9 +18,9 @@ class SqliteDataSource implements IDatasource, IUserDataSource {
   }
 
   @override
-  Future<List<TransactionModel>> get() async {
-    var listOfMapsExpenses = await getExpense();
-    var listOfMapsIncome = await getIncome();
+  Future<List<TransactionModel>> get(String startDate, String endDate) async {
+    var listOfMapsExpenses = await getExpense(startDate, endDate);
+    var listOfMapsIncome = await getIncome(startDate,endDate);
     var listOfMaps = [...listOfMapsIncome, ...listOfMapsExpenses];
     if (listOfMaps.isEmpty) return [];
     return listOfMaps;
@@ -64,14 +64,15 @@ class SqliteDataSource implements IDatasource, IUserDataSource {
   }
 
   @override
-  Future<List<ExpenseModel>> getExpense() async {
-    var listOfMapsExpenses = await _db.query('expense');
+  Future<List<ExpenseModel>> getExpense(String startDate, String endDate) async {
+    var listOfMapsExpenses = await _db.query('expense',where:'dateTime between ? and ?',whereArgs: [startDate,endDate]);
+    print(listOfMapsExpenses);
     return listOfMapsExpenses.map<ExpenseModel>((map) => ExpenseModel.fromMap(map)).toList();
   }
 
   @override
-  Future<List<IncomeModel>> getIncome() async {
-    var listOfMapIncome = await _db.query('income');
+  Future<List<IncomeModel>> getIncome(String startDate, String endDate) async {
+    var listOfMapIncome = await _db.query('income',where:'dateTime between ? and ?',whereArgs: [startDate,endDate]);
     return listOfMapIncome.map<IncomeModel>((map) => IncomeModel.fromMap(map)).toList();
   }
 
@@ -84,7 +85,7 @@ class SqliteDataSource implements IDatasource, IUserDataSource {
   @override
   Future<int> generateUser() async {
     try {
-      int id = await _db.insert('user', {'name': 'Mihir', 'balance': 0,'expense':0,'income':0});
+      int id = await _db.insert('user', {'name': 'User', 'balance': 0,'expense':0,'income':0});
       print("Generated id  is $id");
       return id;
     } catch (e) {

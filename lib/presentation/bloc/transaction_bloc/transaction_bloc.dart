@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:money_manager/application/boundaries/add_transaction/add_transaction_input.dart';
 import 'package:money_manager/application/usecases/add_transaction_usecase.dart';
-import 'package:money_manager/domain/factory/IEntityFactory.dart';
-import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
+import 'package:money_manager/domain/factory/i_entity_factory.dart';
+import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:equatable/equatable.dart';
 
@@ -62,7 +62,6 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         throw Exception(l.message);
       }, (r) => r);
       print("After addtransaction use case load user");
-      // _userBloc.add(LoadUser());
     }
     );
     on<ChangeAmountEvent>((event, emit) {

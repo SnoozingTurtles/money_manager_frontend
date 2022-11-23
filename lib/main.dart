@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/common/connectivity.dart';
@@ -57,10 +55,13 @@ void main() async {
           builder: (context, state) {
             if (state is UserLoaded) {
               return MaterialApp(
-                theme: ThemeData(textTheme: mTextTheme,),
+                theme: ThemeData(
+                  textTheme: mTextTheme,
+                ),
                 home: BlocProvider<HomeBloc>(
-                    create: (context) =>
-                        HomeBloc(transactionRepository: RepositoryProvider.of<TransactionRepository>(context)),
+                    create: (context) => HomeBloc(
+                        transactionRepository: RepositoryProvider.of<TransactionRepository>(context),
+                        userBloc: BlocProvider.of<UserBloc>(context)),
                     child: const DashBoard()),
                 routes: {
                   TransactionView.route: (context) {

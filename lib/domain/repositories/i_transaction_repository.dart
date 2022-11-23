@@ -3,8 +3,8 @@ import 'package:money_manager/domain/value_objects/transaction/value_objects.dar
 
 abstract class ITransactionRepository{
   Future<void> add(Transaction transactions,UserId id);
-  Future<List<Transaction>> getLocal();
-  Future<List<Transaction>> getRemote();
+  Future<List<Transaction>> getLocal(String startDate, String endDate);
+  Future<List<Transaction>> getRemote(String startDate, String endDate);
   Future<List<Map<String,Object?>>> getBuffer();
   Future<void> syncRemoteToLocal();
   Future<void> syncLocalToRemote();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/application/boundaries/get_all_transactions/transaction_dto.dart';
+import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
 import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 
 import '../bloc/user_bloc/user_bloc.dart';
@@ -85,7 +85,6 @@ class _HomeViewState extends State<HomeView> {
                                       physics: NeverScrollableScrollPhysics(),
                                       itemCount: transaction[dIndex].length,
                                       itemBuilder: (BuildContext context, int index) {
-                                        print("Second buildView ${transaction[dIndex]}");
                                         return ListTile(
                                           title: Text(
                                             transaction[dIndex][index].category.value.fold((l) => "Error", (r) => r),

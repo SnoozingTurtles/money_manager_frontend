@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:money_manager/infrastructure/datasource/IDatasource.dart';
+import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/model/model.dart';
 import 'package:dio/dio.dart';
 
@@ -28,17 +28,16 @@ class SpringBootDataSource implements IDatasource {
   }
 
   @override
-  Future<List<TransactionModel>> get() async {
-    Dio dio = Dio();
-    var map1 = await getIncome();
-    var map2 = await getExpense();
+  Future<List<TransactionModel>> get(String startDate, String endDate) async {
+    var map1 = await getIncome(startDate,endDate);
+    var map2 = await getExpense(startDate,endDate);
     List<TransactionModel> listOfMaps = [...map2, ...map1];
     if (listOfMaps.isEmpty) return [];
 
     return listOfMaps;
   }
   @override
-  Future<List<ExpenseModel>> getExpense() async{
+  Future<List<ExpenseModel>> getExpense(String startDate, String endDate) async{
     Dio dio = Dio();
     var mapExpense = await dio.get(
         "https://money-manager-snoozingturtle.herokuapp.com/api/user/1/expenses?pageSize=8&sortBy=dateAdded&sortOrder=DESC");
@@ -52,7 +51,7 @@ class SpringBootDataSource implements IDatasource {
     return map1.map((expense) => ExpenseModel.fromSpringMap(expense)).toList();
   }
   @override
-  Future<List<IncomeModel>> getIncome()async{
+  Future<List<IncomeModel>> getIncome(String startDate, String endDate)async{
     Dio dio = Dio();
     var mapExpense = await dio.get(
         "https://money-manager-snoozingturtle.herokuapp.com/api/user/1/incomes?pageSize=8&sortBy=dateAdded&sortOrder=DESC");

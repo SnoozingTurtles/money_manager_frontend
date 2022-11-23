@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
-import 'package:money_manager/application/boundaries/add_transaction/IAddTransactionUseCase.dart';
+import 'package:money_manager/application/boundaries/add_transaction/i_add_transaction_usecase.dart';
 import 'package:money_manager/application/boundaries/add_transaction/add_transaction_input.dart';
 import 'package:money_manager/application/boundaries/add_transaction/add_transaction_output.dart';
-import 'package:money_manager/domain/factory/IEntityFactory.dart';
+import 'package:money_manager/domain/factory/i_entity_factory.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
-import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
+import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/domain/value_objects/value_failure.dart';
 
 class AddTransactionUseCase implements IAddTransactionUseCase {

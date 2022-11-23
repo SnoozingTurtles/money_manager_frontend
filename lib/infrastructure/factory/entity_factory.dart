@@ -1,4 +1,4 @@
-import 'package:money_manager/domain/factory/IEntityFactory.dart';
+import 'package:money_manager/domain/factory/i_entity_factory.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/models/user_model.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
