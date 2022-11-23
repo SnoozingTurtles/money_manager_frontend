@@ -83,7 +83,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           transactions: transactions,
           syncLoading: false,
           filter:
-              "Transactions From ${event.startDate.toString().substring(0, 10)} to ${event.endDate.toString().substring(0, 10)}"));
+              "${event.startDate.toString().substring(0, 10)} to ${event.endDate.toString().substring(0, 10)}"));
     });
   }
 
