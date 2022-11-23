@@ -22,12 +22,17 @@ class _DashBoardState extends State<DashBoard> {
     sh = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text("All Time"),
+        title: BlocConsumer<HomeBloc,HomeState>(
+          listener: (context,state){},
+          builder: (context,state) {
+            return state is HomeLoaded?Text(state.filter):Text("Loading");
+          }
+        ),
         actions: [
           PopupMenuButton(itemBuilder: (context) {
             return [
               PopupMenuItem(
-                  child: Text("This Month"),
+                  child: const Text("This Month"),
                   onTap: () {
                     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
                   }),
@@ -52,7 +57,7 @@ class _DashBoardState extends State<DashBoard> {
                     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionEvent());
                   }),
               PopupMenuItem(
-                  child: Text("Custom"),
+                  child: const Text("Custom"),
                   onTap: () async {
                     var output = await Future.delayed(
                         const Duration(seconds: 0),

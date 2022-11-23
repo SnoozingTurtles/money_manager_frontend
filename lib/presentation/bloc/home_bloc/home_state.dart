@@ -12,14 +12,15 @@ class HomeInitial extends HomeState {
 class HomeLoaded extends HomeState {
   final SplayTreeMap<String,List<TransactionDTO>> transactions;
   final bool syncLoading;
-  const HomeLoaded({required this.transactions,required this.syncLoading});
+  final String filter;
+  const HomeLoaded({required this.transactions,required this.syncLoading,required this.filter});
 
-  HomeLoaded copyWith({bool? syncLoading}) {
-    return HomeLoaded(transactions:transactions,syncLoading: syncLoading ?? this.syncLoading);
+  HomeLoaded copyWith({bool? syncLoading,String?filter}) {
+    return HomeLoaded(transactions:transactions,syncLoading: syncLoading ?? this.syncLoading,filter: filter??this.filter);
   }
 
   @override
-  List<Object?> get props => [syncLoading];
+  List<Object?> get props => [syncLoading,filter];
 }
 
 class HomeLoading extends HomeState {
