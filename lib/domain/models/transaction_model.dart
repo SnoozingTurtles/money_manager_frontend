@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
-abstract class Transaction {
+abstract class Transaction extends Equatable{
   Amount amount;
   Category category; //Income category
   Note? note;
@@ -28,6 +29,10 @@ class Income extends Transaction {
             dateTime: dateTime,
             note: note,
             recurring: recurring);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [amount,category,note,dateTime,recurring];
 }
 
 class Expense extends Transaction {
@@ -50,4 +55,8 @@ class Expense extends Transaction {
   String toString() {
     return "$amount";
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [amount,category,note,dateTime,recurring,medium];
 }

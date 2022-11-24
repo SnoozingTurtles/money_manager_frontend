@@ -33,12 +33,24 @@ class Category extends Equatable {
 
   factory Category(String value) {
     return Category._(
-      validateFieldNotEmpty(value).flatMap((a) => validateSingleLine(a)
-          .flatMap((string) => validateMaxStringLength(string, 10))),
+      validateFieldNotEmpty(value)
+          .flatMap((a) => validateSingleLine(a).flatMap((string) => validateMaxStringLength(string, 10))),
     );
   }
   const Category._(this.value);
 
   @override
   List<Object?> get props => [value];
+}
+
+class UserId extends Equatable {
+  final int value;
+
+  factory UserId(int value) {
+    return UserId._(value);
+  }
+  const UserId._(this.value);
+
+  @override
+  List<Object> get props => [value];
 }

@@ -1,12 +1,13 @@
+import 'package:equatable/equatable.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
-abstract class TransactionDTO {
-  Amount amount;
-  Category category; //IncomeDTO category
-  Note? note;
-  DateTime dateTime;
-  bool recurring;
+abstract class TransactionDTO extends Equatable{
+  final Amount amount;
+  final Category category; //IncomeDTO category
+  final Note? note;
+  final DateTime dateTime;
+  final bool recurring;
 
   TransactionDTO(
       {required this.amount,
@@ -14,6 +15,7 @@ abstract class TransactionDTO {
         this.note,
         required this.dateTime,
         required this.recurring});
+
 }
 
 class IncomeDTO extends TransactionDTO {
@@ -29,6 +31,17 @@ class IncomeDTO extends TransactionDTO {
       dateTime: dateTime,
       note: note,
       recurring: recurring);
+
+  IncomeDTO.fromEntity(Transaction transaction)
+      : this(
+      amount: transaction.amount,
+      category: transaction.category,
+      dateTime: transaction.dateTime,
+      recurring: transaction.recurring,
+      note: transaction.note);
+  @override
+  // TODO: implement props
+  List<Object?> get props => [amount,category,note,dateTime,recurring];
 }
 
 class ExpenseDTO extends TransactionDTO {
@@ -56,8 +69,12 @@ class ExpenseDTO extends TransactionDTO {
       medium: "Cash",
       note: transaction.note);
 
+  // @override
+  // String toString() {
+  //   return "$amount";
+  // }
+
   @override
-  String toString() {
-    return "$amount";
-  }
+  // TODO: implement props
+  List<Object?> get props => [amount,category,dateTime,recurring,note];
 }

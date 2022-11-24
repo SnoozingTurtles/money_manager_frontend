@@ -13,7 +13,7 @@ void main(){
     test('should perform a database insert', () async {
       //arrange
       var map = {
-        "amount": "3",
+        "amount": "40000",
         "category": "biryani",
         "dateTime": DateTime.now().toIso8601String(),
         "note": "note",
@@ -29,16 +29,16 @@ void main(){
       // expect(recieve.length,3);
     });
   });
-  // group('spring.get()', () {
-  //   test('should perform api query and return all records', () async {
-  //     //arrange
-  //
-  //     //act
-  //     var expenseModels = await sut.get();
-  //
-  //     //assert
-  //     expect(expenseModels, isNotEmpty);
-  //     expect(expenseModels[0].amount,Amount("0"));
-  //   });
-  // });
+  group('spring.get()', () {
+    test('should perform api query and return all records', () async {
+      //arrange
+
+      //act
+      var expenseModels = await sut.get();
+
+      //assert
+      expect(expenseModels, isNotEmpty);
+      expect(expenseModels[1].amount,Amount("2"));
+    });
+  });
 }

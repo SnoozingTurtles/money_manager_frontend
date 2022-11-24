@@ -5,8 +5,10 @@ abstract class TransactionEvent extends Equatable {
 }
 
 class AddTransaction extends TransactionEvent {
+  final UserId id;
+  const AddTransaction({required this.id});
   @override
-  List<Object> get props => [];
+  List<Object> get props => [id];
 }
 
 class ChangeAmountEvent extends TransactionEvent {
@@ -35,4 +37,14 @@ class ChangeDateEvent extends TransactionEvent{
   const ChangeDateEvent({required this.date});
   @override
   List<Object?> get props => [date];
+}
+class FlipIncome extends TransactionEvent{
+  @override
+  List<Object?> get props => [];
+
+}
+class FlipExpense extends TransactionEvent{
+  @override
+  List<Object?> get props => [];
+
 }
