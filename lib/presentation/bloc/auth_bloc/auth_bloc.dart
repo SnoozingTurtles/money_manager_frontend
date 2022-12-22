@@ -52,7 +52,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await syncAllTransactionUseCase.executeLocalToRemote();
     });
     on<RemoveLocal>((event, emit) async {
-      await removeAllTransactionUseCase.execute();
+      // await removeAllTransactionUseCase.execute();
       add(AuthInitialEvent());
     });
     on<AuthPass>((event, emit) async {

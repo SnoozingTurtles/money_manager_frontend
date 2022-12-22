@@ -4,6 +4,7 @@ import 'package:money_manager/application/boundaries/get_transactions/i_get_all_
 import 'package:money_manager/application/boundaries/get_transactions/get_transaction_output.dart';
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
 import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
+import '../../domain/models/transaction_model.dart';
 import '../../infrastructure/model/infra_transaction_model.dart';
 
 
@@ -69,7 +70,7 @@ class GetAllTransactionUseCase implements IGetTransactionUseCase {
     var transactions =await _transactionRepository.getLocal(startDate, endDate);
 
     var test = transactions.groupBy((p0) => p0.dateTime.toString().substring(0,10));
-    var output =  test.map((key, value) => MapEntry(key, test[key]!.map((e) => e is ExpenseModel? ExpenseDTO.fromEntity(e):IncomeDTO.fromEntity(e),).toList()));
+    var output =  test.map((key, value) => MapEntry(key, test[key]!.map((e) => e is Expense? ExpenseDTO.fromEntity(e):IncomeDTO.fromEntity(e),).toList()));
 
     return GetAllTransactionOutput(transactions: SplayTreeMap.from(output));
   }
