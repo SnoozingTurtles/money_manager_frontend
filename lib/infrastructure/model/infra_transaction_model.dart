@@ -1,34 +1,38 @@
 import 'package:money_manager/domain/models/transaction_model.dart';
-import 'package:money_manager/domain/models/user_model.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
+import 'package:money_manager/domain/value_objects/user/value_objects.dart';
 
-abstract class TransactionModel extends Transaction {
+abstract class TransactionModel {
   UserId id;
   Amount amount;
   Category category; //IncomeModel category
   Note? note;
   DateTime dateTime;
   bool recurring;
+  String? token;
 
   TransactionModel(
       {required this.amount,
-      required this.category,
-      this.note,
-      required this.dateTime,
-      required this.recurring,
-      required this.id})
-      : super(amount: amount, category: category, dateTime: dateTime, recurring: recurring, note: note);
+        required this.category,
+        this.note,
+        this.token,
+        required this.dateTime,
+        required this.recurring,
+        required this.id});
+
 }
+
 
 class IncomeModel extends TransactionModel {
   IncomeModel(
       {required Amount amount,
-      required UserId id,
-      required Category category,
-      Note? note,
-      required DateTime dateTime,
-      required bool recurring})
-      : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
+        required UserId id,
+        required Category category,
+        String?token,
+        Note? note,
+        required DateTime dateTime,
+        required bool recurring})
+      : super(token:token,amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
 
   factory IncomeModel.fromMap(Map<String, dynamic> map) {
     return IncomeModel(
@@ -47,6 +51,17 @@ class IncomeModel extends TransactionModel {
         dateTime: DateTime.parse("${map['dateAdded']}"),
         recurring: bool.fromEnvironment("false"),
         note: map['description'] == null ? null : Note(map['description']!));
+  }
+
+  Income toDIncome(){
+    return Income(
+      amount: amount,
+      dateTime: dateTime,
+      category: category,
+      recurring: recurring,
+      token: token,
+      note: note,
+    );
   }
   Map<String, dynamic> toMap() {
     return {
@@ -86,17 +101,19 @@ class IncomeModel extends TransactionModel {
   List<Object?> get props => [];
 }
 
+
 class ExpenseModel extends TransactionModel {
   String medium; //account, cash, card
   ExpenseModel(
       {required Amount amount,
-      required UserId id,
-      required Category category,
-      Note? note,
-      required DateTime dateTime,
-      required bool recurring,
-      required this.medium})
-      : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
+        required UserId id,
+        required Category category,
+        Note? note,
+        String?token,
+        required DateTime dateTime,
+        required bool recurring,
+        required this.medium})
+      : super(token:token,amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
 
   @override
   String toString() {
@@ -125,6 +142,17 @@ class ExpenseModel extends TransactionModel {
         note: map['description'] == null ? null : Note(map['description']!));
   }
 
+  Expense toDExpense(){
+    return Expense(
+      amount: amount,
+      dateTime: dateTime,
+      category: category,
+      recurring: recurring,
+      token: token,
+      note: note,
+      medium: medium,
+    );
+  }
   Map<String, dynamic> toMap() {
     return {
       "userId": id.value,
@@ -164,13 +192,4 @@ class ExpenseModel extends TransactionModel {
   @override
   // TODO: implement props
   List<Object?> get props => [];
-}
-
-class UserModel extends User {
-  UserId userId;
-  double balance;
-  double income;
-  double expense;
-  UserModel({required this.userId, required this.balance, required this.income, required this.expense})
-      : super(userId: userId, balance: balance, income: income, expense: expense);
 }

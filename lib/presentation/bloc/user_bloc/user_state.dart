@@ -8,15 +8,17 @@ class UserNotLoaded extends UserState {
   @override
   List<Object> get props => [];
 }
-class UserLoaded extends UserState{
 
+class UserLoaded extends UserState {
   final User user;
 
-  const UserLoaded(this.user);
+  const UserLoaded({required this.user});
   @override
   List<Object> get props => [user];
 
-  UserLoaded copyWith({ User? user}){
-    return UserLoaded(user??this.user);
+  UserLoaded copyWith({User? user}) {
+    return UserLoaded(
+      user: user ?? this.user,
+    );
   }
 }

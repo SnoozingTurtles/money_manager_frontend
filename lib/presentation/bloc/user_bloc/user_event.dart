@@ -18,13 +18,20 @@ class LoadUser extends UserEvent{
 }
 
 class ReloadUser extends UserEvent{
-  final double balance;
-  final double income;
-  final double expense;
+  final double? balance;
+  final double? income;
+  final double? expense;
   const ReloadUser({required this.balance,required this.income,required this.expense});
   @override
   // TODO: implement props
   List<Object?> get props =>[balance,income,expense];
-
+}
+class EmailTokenEvent extends UserEvent{
+  final Email? email;
+  final String? token;
+  const EmailTokenEvent({required this.email, required this.token});
+  @override
+  // TODO: implement props
+  List<Object?> get props =>[];
 }
 

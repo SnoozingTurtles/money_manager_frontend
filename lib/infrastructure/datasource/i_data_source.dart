@@ -1,4 +1,5 @@
-import 'package:money_manager/infrastructure/model/model.dart';
+
+import '../model/infra_transaction_model.dart';
 
 abstract class IDatasource{
   Future<void> addTransaction(TransactionModel model);

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/presentation/bloc/transaction_bloc/transaction_bloc.dart';
 
+import '../bloc/home_bloc/home_bloc.dart';
 import '../bloc/user_bloc/user_bloc.dart';
 
 List<String> months = [
@@ -29,7 +30,9 @@ class TransactionView extends StatefulWidget {
 }
 
 class _TransactionViewState extends State<TransactionView> {
-  final key = GlobalKey<FormState>();
+  static final key = GlobalKey<FormState>();
+  static var innerKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<TransactionBloc, TransactionState>(
@@ -113,9 +116,9 @@ class _TransactionViewState extends State<TransactionView> {
                               ChoiceChip(
                                 selected: !state.income,
                                 label: const Text("Expense"),
-                                  onSelected: (val) {
-                                    BlocProvider.of<TransactionBloc>(context).add(FlipExpense());
-                                  },
+                                onSelected: (val) {
+                                  BlocProvider.of<TransactionBloc>(context).add(FlipExpense());
+                                },
                               ),
                             ],
                           )),
@@ -126,11 +129,11 @@ class _TransactionViewState extends State<TransactionView> {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: state.category.value.isLeft() ? Colors.red : Colors.blue),
                             onPressed: () async {
-                              var key = GlobalKey<FormState>();
                               await showDialog(
                                   context: context,
                                   builder: (ctx) {
                                     return Form(
+                                      key: innerKey,
                                       autovalidateMode: AutovalidateMode.disabled,
                                       child: AlertDialog(
                                         title: const Text("Enter what you payed for"),
@@ -175,6 +178,8 @@ class _TransactionViewState extends State<TransactionView> {
                                   BlocProvider.of<TransactionBloc>(context).add(
                                     AddTransaction(id: state.uid),
                                   );
+                                  BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
+
                                   Navigator.pop(context);
                                 } else if (state.category.value.fold((l) => true, (r) => false)) {
                                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

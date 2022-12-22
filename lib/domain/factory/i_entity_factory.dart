@@ -2,10 +2,13 @@ import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/models/user_model.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
+import '../value_objects/user/value_objects.dart';
+
 abstract class IEntityFactory {
   Income newIncome(
       {required Amount amount,
       Note? note,
+      String? token,
       required Category category,
       required DateTime dateTime,
       required bool recurring});
@@ -13,6 +16,7 @@ abstract class IEntityFactory {
   Expense newExpense({
     required Amount amount,
     Note? note,
+    String? token,
     required Category category,
     required DateTime dateTime,
     required bool recurring,
@@ -24,5 +28,7 @@ abstract class IEntityFactory {
     required double balance,
     required double expense,
     required double income,
+    required bool loggedIn,
+    UserId? remoteId,
   });
 }

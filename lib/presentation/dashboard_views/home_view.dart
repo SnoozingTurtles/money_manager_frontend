@@ -18,6 +18,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void initState() {
+    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
     super.initState();
   }
 
@@ -25,7 +26,9 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return BlocConsumer<UserBloc, UserState>(
       listener: (context, state) {
+        print(state.props.toString());
         if (state is UserLoaded) {
+          BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
           print("Listener $state.user.balance");
         }
       },
@@ -48,7 +51,7 @@ class _HomeViewState extends State<HomeView> {
                         Container(
                           margin: EdgeInsets.all(8),
                           padding: EdgeInsets.all(8),
-                          height: sh! * (1 / 4),
+                          height: height! * (1 / 4),
                           child: Card(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             elevation: 12,
@@ -90,7 +93,7 @@ class _HomeViewState extends State<HomeView> {
                                             transaction[dIndex][index].category.value.fold((l) => "Error", (r) => r),
                                           ),
                                           trailing: SizedBox(
-                                            width: sw! * 1 / 5,
+                                            width: width! * 1 / 5,
                                             child: Row(
                                               children: [
                                                 Text(

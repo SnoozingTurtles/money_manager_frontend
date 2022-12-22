@@ -5,6 +5,9 @@ import 'package:money_manager/infrastructure/datasource/spring_data_source.dart'
 import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
 import 'package:money_manager/infrastructure/factory/entity_factory.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
+import 'package:money_manager/presentation/auth_views/auth_view.dart';
+import 'package:money_manager/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:money_manager/presentation/bloc/auth_bloc/form/auth_form_bloc.dart';
 import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 import 'package:money_manager/presentation/bloc/transaction_bloc/transaction_bloc.dart';
 import 'package:money_manager/presentation/bloc/user_bloc/user_bloc.dart';
@@ -21,88 +24,139 @@ void main() async {
   ConnectivitySingleton _connectivity = ConnectivitySingleton.getInstance();
   _connectivity.initialize();
   final db = await DatabaseFactory().createDatabase();
-  final prefs = await SharedPreferences.getInstance();
   bool firstLogin = false;
-  if (prefs.getBool("firstTimeLaunch") == null) {
-    print("first run");
-    prefs.setBool("firstTimeLaunch", true);
+
+  final prefs = await SharedPreferences.getInstance();
+  if (prefs.getBool("first_run") == null) {
     firstLogin = true;
   }
   //sync remote to local will be shifted to user login
-  runApp(
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider(create: (context) => EntityFactory()),
-        RepositoryProvider(
-            create: (context) =>
-                UserRepository(localDatasource: SqliteDataSource(db: db), entityFactory: EntityFactory())),
-        RepositoryProvider(
-            create: (context) => TransactionRepository(
-                localDatasource: SqliteDataSource(db: db),
-                connectivity: _connectivity,
-                remoteDatasource: SpringBootDataSource())),
-      ],
-      child: BlocProvider(
-        create: (context) => firstLogin
-            ? (UserBloc(userRepository: RepositoryProvider.of<UserRepository>(context))..add(InitUser()))
-            : (UserBloc(userRepository: RepositoryProvider.of<UserRepository>(context))..add(LoadUser())),
-        child: BlocConsumer<UserBloc, UserState>(
-          listener: (context, state) {
-            if (state is UserLoaded) {
-              print("state is loaded ${state.user.balance}");
-            }
-          },
-          builder: (context, state) {
-            if (state is UserLoaded) {
-              return MaterialApp(
-                theme: ThemeData(
-                  textTheme: mTextTheme,
+  BlocOverrides.runZoned(
+    () {
+      return runApp(
+        MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider<EntityFactory>(create: (context) => EntityFactory()),
+            RepositoryProvider<UserRepository>(
+                create: (context) => UserRepository(
+                      localDatasource: SqliteDataSource(db: db),
+                      entityFactory: EntityFactory(),
+                    )..cleanIfFirstUseAfterUninstall()),
+            RepositoryProvider<TransactionRepository>(
+                create: (context) => TransactionRepository(
+                    localDatasource: SqliteDataSource(db: db),
+                    connectivity: _connectivity,
+                    remoteDatasource: SpringBootDataSource())),
+          ],
+          child: MultiBlocProvider(
+              providers: [
+                BlocProvider<UserBloc>(
+                  create: (context) => firstLogin
+                      ? (UserBloc(userRepository: RepositoryProvider.of<UserRepository>(context))..add(InitUser()))
+                      : (UserBloc(userRepository: RepositoryProvider.of<UserRepository>(context))..add(LoadUser())),
                 ),
-                home: BlocProvider<HomeBloc>(
-                    create: (context) => HomeBloc(
-                        transactionRepository: RepositoryProvider.of<TransactionRepository>(context),
-                        userBloc: BlocProvider.of<UserBloc>(context)),
-                    child: const DashBoard()),
-                routes: {
-                  TransactionView.route: (context) {
-                    return BlocProvider<TransactionBloc>(
-                      create: (context) => TransactionBloc(
-                          userBloc: BlocProvider.of<UserBloc>(context),
-                          id: state.user.userId,
-                          iTransactionRepository: RepositoryProvider.of<TransactionRepository>(context),
-                          iEntityFactory: RepositoryProvider.of<EntityFactory>(context)),
-                      child: TransactionView(),
-                    );
-                  }
+                BlocProvider<AuthBloc>(
+                  create: (context) => AuthBloc(
+                      RepositoryProvider.of<UserRepository>(context),
+                      TransactionRepository(
+                          localDatasource: SqliteDataSource(db: db),
+                          connectivity: _connectivity,
+                          remoteDatasource: SpringBootDataSource()))
+                    ..add(AuthInitialEvent()),
+                ),
+                BlocProvider<HomeBloc>(
+                  create: (context) => HomeBloc(
+                      transactionRepository: RepositoryProvider.of<TransactionRepository>(context),
+                      userBloc: BlocProvider.of<UserBloc>(context)),
+                ),
+              ],
+              child: BlocConsumer<AuthBloc, AuthState>(
+                listener: (context, authState) {},
+                builder: (context, authState) {
+                  print("Auth state is + ${authState}");
+                  return MaterialApp(
+                    theme: ThemeData(
+                      textTheme: mTextTheme,
+                    ),
+                    home: BlocConsumer<HomeBloc, HomeState>(
+                        listener: (context, state) {},
+                        builder: (context, state) {
+                          if (authState is AuthAuthenticated || authState is AuthPassed) {
+                            return BlocConsumer<UserBloc, UserState>(
+                              listener: (context, state) {
+                                // TODO: implement listener
+                              },
+                              builder: (context, state) {
+                                if (state is UserLoaded)
+                                  return DashBoard();
+                                else
+                                  return CircularProgressIndicator();
+                              },
+                            );
+                          } else if (authState is AuthLoading) {
+                            return CircularProgressIndicator();
+                          } else {
+                            return BlocProvider<AuthFormBloc>(
+                              create: (context) => AuthFormBloc(),
+                              child: AuthScreen(),
+                            );
+                          }
+                        }),
+                    routes: {
+                      TransactionView.route: (context) {
+                        return BlocConsumer<UserBloc, UserState>(
+                          listener: (context, state) {
+                            // TODO: implement listener
+                          },
+                          builder: (context, state) {
+                            if (state is UserLoaded) {
+                              return BlocProvider<TransactionBloc>(
+                                create: (context) => TransactionBloc(
+                                    userBloc: BlocProvider.of<UserBloc>(context),
+                                    id: state.user.userId,
+                                    iTransactionRepository: RepositoryProvider.of<TransactionRepository>(context),
+                                    iEntityFactory: RepositoryProvider.of<EntityFactory>(context)),
+                                child: TransactionView(),
+                              );
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          },
+                        );
+                      }
+                    },
+                  );
                 },
-              );
-            } else {
-              return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
-            }
-          },
+              )),
         ),
-      ),
-    ),
+      );
+    },
+    blocObserver: MyGlobalObserver(),
   );
-  SimpleBlocObserver observer = SimpleBlocObserver();
 }
 
-class SimpleBlocObserver extends BlocObserver {
+class MyGlobalObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
-    print(event);
+    debugPrint('${bloc.runtimeType} $event');
+  }
+
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    debugPrint('${bloc.runtimeType} $change');
   }
 
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    print(transition);
+    debugPrint('${bloc.runtimeType} $transition');
   }
 
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
-    print(error);
+    debugPrint('${bloc.runtimeType} $error $stackTrace');
     super.onError(bloc, error, stackTrace);
   }
 }

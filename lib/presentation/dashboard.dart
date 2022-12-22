@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/common/secure_storage.dart';
 import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 import 'package:money_manager/presentation/constants.dart';
 import 'package:money_manager/presentation/dashboard_views/home_view.dart';
 import 'package:money_manager/presentation/dashboard_views/stats_view.dart';
 import 'package:money_manager/presentation/transaction_views/transaction_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'bloc/auth_bloc/auth_bloc.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -18,17 +22,37 @@ class _DashBoardState extends State<DashBoard> {
   int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
-    sw = MediaQuery.of(context).size.width;
-    sh = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: BlocConsumer<HomeBloc,HomeState>(
-          listener: (context,state){},
-          builder: (context,state) {
-            return state is HomeLoaded?Text(state.filter):Text("Loading");
-          }
-        ),
+        title: BlocConsumer<HomeBloc, HomeState>(
+            listener: (context, state) {},
+            builder: (context, state) {
+              return state is HomeLoaded ? Text(state.filter) : Text("Loading");
+            }),
         actions: [
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              if(state is AuthPassed){
+                return IconButton(
+                    icon: Icon(Icons.login),
+                    onPressed: () async{
+                      SharedPreferences.getInstance().then((value) {
+                        value.setBool('pass', false);
+                        BlocProvider.of<AuthBloc>(context).add(AuthInitialEvent());
+                      },);
+                    });
+              }else {
+                return IconButton(
+                  icon: Icon(Icons.exit_to_app),
+                  onPressed: () {
+                    SecureStorage().deleteToken();
+                    BlocProvider.of<AuthBloc>(context).add(RemoveLocal());
+                  });
+              }
+            },
+          ),
           PopupMenuButton(itemBuilder: (context) {
             return [
               PopupMenuItem(
@@ -66,9 +90,9 @@ class _DashBoardState extends State<DashBoard> {
                               firstDate: DateTime.now().subtract(const Duration(days: 360)),
                               lastDate: DateTime.now().add(const Duration(days: 360)),
                             ));
-                    if(output != null) {
+                    if (output != null) {
                       BlocProvider.of<HomeBloc>(context)
-                        .add(LoadTransactionsCustomEvent(startDate: output.start, endDate: output.end));
+                          .add(LoadTransactionsCustomEvent(startDate: output.start, endDate: output.end));
                     }
                   }),
             ];
@@ -105,8 +129,8 @@ class _DashBoardState extends State<DashBoard> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionEvent());
+    super.initState();
   }
 }

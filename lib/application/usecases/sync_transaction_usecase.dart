@@ -7,11 +7,17 @@ class SyncAllTransactionUseCase implements ISyncAllTransactionUseCase {
   SyncAllTransactionUseCase({required TransactionRepository transactionRepository})
       : _transactionRepository = transactionRepository;
   @override
-  Future<void> execute() async{
+  Future<void> executeLocalToRemote() async {
     var transactions = await _transactionRepository.getBuffer();
     print(transactions);
-    if(transactions.isNotEmpty) {
+    if (transactions.isNotEmpty) {
       await _transactionRepository.syncLocalToRemote();
     }
+  }
+
+  @override
+  Future<void> executeRemoteToLocal() async {
+    print("execute remote to local");
+    await _transactionRepository.syncRemoteToLocal();
   }
 }

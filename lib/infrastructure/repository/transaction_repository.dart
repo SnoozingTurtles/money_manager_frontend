@@ -1,16 +1,19 @@
+import 'package:flutter/cupertino.dart';
 import 'package:money_manager/common/connectivity.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/infrastructure/datasource/spring_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
-import 'package:money_manager/infrastructure/model/model.dart';
+import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
 
-import '../../domain/value_objects/transaction/value_objects.dart';
+import '../../domain/value_objects/user/value_objects.dart';
 
 class TransactionRepository implements ITransactionRepository {
   final SqliteDataSource _localDatasource;
   final SpringBootDataSource _remoteDatasource;
   final ConnectivitySingleton _connectivity;
+  String? token;
+
   TransactionRepository(
       {required SqliteDataSource localDatasource,
       required SpringBootDataSource remoteDatasource,
@@ -35,6 +38,7 @@ class TransactionRepository implements ITransactionRepository {
           amount: transaction.amount,
           category: transaction.category,
           dateTime: transaction.dateTime,
+          token: transaction.token,
           recurring: transaction.recurring,
           note: transaction.note,
           medium: transaction.medium);
@@ -44,14 +48,20 @@ class TransactionRepository implements ITransactionRepository {
         amount: transaction.amount,
         category: transaction.category,
         dateTime: transaction.dateTime,
+        token: transaction.token,
         recurring: transaction.recurring,
         note: transaction.note,
       );
     }
     //connectivity
-    if (_connectivity.hasConnection) {
-      await _localDatasource.addTransaction(model);
-      return await _remoteDatasource.addTransaction(model);
+    if (model.token != null) {
+      if (_connectivity.hasConnection) {
+        await _localDatasource.addTransaction(model);
+        await _remoteDatasource.addTransaction(model).onError((error, stackTrace) => _localDatasource.addBuffer(model));
+      } else {
+        await _localDatasource.addBuffer(model);
+        return await _localDatasource.addTransaction(model);
+      }
     } else {
       await _localDatasource.addBuffer(model);
       return await _localDatasource.addTransaction(model);
@@ -60,13 +70,14 @@ class TransactionRepository implements ITransactionRepository {
 
   @override
   Future<List<Transaction>> getLocal(String startDate, String endDate) async {
-    var value = await _localDatasource.get(startDate,endDate);
-    return value;
+    var transactions = await _localDatasource.get(startDate, endDate);
+    return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
   }
 
   @override
-  Future<List<TransactionModel>> getRemote(String startDate, String endDate) async {
-    return _remoteDatasource.get(startDate,endDate);
+  Future<List<Transaction>> getRemote(String startDate, String endDate) async {
+    var transactions = await _remoteDatasource.get(startDate, endDate);
+    return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
   }
 
   @override
@@ -76,8 +87,10 @@ class TransactionRepository implements ITransactionRepository {
 
   @override
   Future<void> syncRemoteToLocal() async {
-    // var map = await _remoteDatasource.get();
-    List<TransactionModel> map = [];
+    var startDate = DateTime.now().subtract(const Duration(days: 365));
+    var endDate = DateTime.now();
+    var map = await _remoteDatasource.get(startDate.toIso8601String(), endDate.toIso8601String());
+    // await _localDatasource.cleanDB();
     print("remote to local map: $map");
     if (map.isNotEmpty) {
       for (var element in map) {
@@ -88,10 +101,22 @@ class TransactionRepository implements ITransactionRepository {
 
   @override
   Future<void> syncLocalToRemote() async {
-    var map = await getBuffer();
-    print("Check empty buffer");
-    print(map);
-    await _remoteDatasource.addFromLocalBuffer(map);
-    await _localDatasource.clearBuffer();
+    if (_connectivity.hasConnection) {
+      var map = await getBuffer();
+      print("Check empty buffer : $map");
+      try {
+        await _remoteDatasource.addFromLocalBuffer(map);
+      } catch (e) {
+        debugPrint('SYNC LOCAL TO REMOTE ERROR: $e');
+        return;
+      }
+      await _localDatasource.clearBuffer();
+    } else {
+      return;
+    }
+  }
+
+  Future<void> clearDB() async {
+    await _localDatasource.cleanDB();
   }
 }

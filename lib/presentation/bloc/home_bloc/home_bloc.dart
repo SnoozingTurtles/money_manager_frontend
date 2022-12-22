@@ -9,6 +9,7 @@ import 'package:money_manager/application/usecases/get_transaction_usecase.dart'
 import 'package:money_manager/application/usecases/sync_transaction_usecase.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 
+import '../../../common/secure_storage.dart';
 import '../user_bloc/user_bloc.dart';
 
 part 'home_event.dart';
@@ -24,17 +25,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         _syncTransactionUseCase = SyncAllTransactionUseCase(transactionRepository: transactionRepository),
         _userBloc = userBloc,
         super(HomeInitial()) {
-    subscription = transactionRepository.connectivityStream.listen((event) {
+    SecureStorage _secureStorage = SecureStorage();
+    // var token = (userBloc.state as UserLoaded).token;
+    subscription = transactionRepository.connectivityStream.listen((event) async{
       print("EVENT FROM STREAM");
       print("Event is $event");
-      if (event) {
+      if (event && await _secureStorage.hasToken()) {
+        print("has token thus logged in");
         add(const SyncTransactionEvent());
       }
     });
     on<SyncTransactionEvent>((event, emit) async {
       if (state is HomeLoaded) {
         emit((state as HomeLoaded).copyWith(syncLoading: true));
-        await _syncTransactionUseCase.execute();
+        await _syncTransactionUseCase.executeLocalToRemote();
         emit((state as HomeLoaded).copyWith(syncLoading: false));
       }
     });
@@ -42,7 +46,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(HomeLoading());
       GetAllTransactionOutput getAllTransactionOutput = await _getAllTransactionUseCase.executeAllTime();
       var transactions = getAllTransactionOutput.transactions;
-      _userBloc.add(LoadUser());
+      _reloadUserBalance(transactions.values);
       emit(HomeLoaded(transactions: transactions, syncLoading: false, filter: "All Time"));
     });
     on<LoadTransactionsThisMonthEvent>((event, emit) async {

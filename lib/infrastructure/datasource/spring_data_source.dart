@@ -1,21 +1,26 @@
 import 'package:flutter/foundation.dart';
+import 'package:money_manager/common/constants.dart';
+import 'package:money_manager/common/diox.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
-import 'package:money_manager/infrastructure/model/model.dart';
-import 'package:dio/dio.dart';
+import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
 
+import '../../common/secure_storage.dart';
+
+//only token usage in application is here get rid of token every where else ...
 class SpringBootDataSource implements IDatasource {
   @override
   Future<void> addExpense(ExpenseModel expense) async {
-    Dio dio = Dio();
+    Api _xdio = Api(accessToken: expense.token);
     Map<String, dynamic> map = expense.toSpringMap();
-    await dio.post("https://money-manager-snoozingturtle.herokuapp.com/api/user/1/expenses", data: map);
+    await _xdio.api.post(EXPENSE_ENDPOINT, data: map);
   }
 
   @override
   Future<void> addIncome(IncomeModel income) async {
-    Dio dio = Dio();
+    Api _xdio = Api(accessToken: income.token);
     Map<String, dynamic> map = income.toSpringMap();
-    await dio.post("https://money-manager-snoozingturtle.herokuapp.com/api/user/1/incomes", data: map);
+
+    await _xdio.api.post(INCOME_ENDPOINT, data: map);
   }
 
   @override
@@ -29,44 +34,49 @@ class SpringBootDataSource implements IDatasource {
 
   @override
   Future<List<TransactionModel>> get(String startDate, String endDate) async {
-    var map1 = await getIncome(startDate,endDate);
-    var map2 = await getExpense(startDate,endDate);
+    var map1 = await getIncome(startDate, endDate);
+    var map2 = await getExpense(startDate, endDate);
     List<TransactionModel> listOfMaps = [...map2, ...map1];
     if (listOfMaps.isEmpty) return [];
 
     return listOfMaps;
   }
+
   @override
-  Future<List<ExpenseModel>> getExpense(String startDate, String endDate) async{
-    Dio dio = Dio();
-    var mapExpense = await dio.get(
-        "https://money-manager-snoozingturtle.herokuapp.com/api/user/1/expenses?pageSize=8&sortBy=dateAdded&sortOrder=DESC");
+  Future<List<ExpenseModel>> getExpense(String startDate, String endDate) async {
+    var token = await SecureStorage().getToken();
+    Api _xdio = Api(accessToken: token);
+
+    var mapExpense = await _xdio.api.get(EXPENSE_ENDPOINT);
 
     List map1 = [];
-    try{
-      map1 = mapExpense.data["expenses"];
-    }catch(e){
+    try {
+      map1 = mapExpense.data["dtoData"];
+    } catch (e) {
       debugPrint(e.toString());
     }
     return map1.map((expense) => ExpenseModel.fromSpringMap(expense)).toList();
   }
-  @override
-  Future<List<IncomeModel>> getIncome(String startDate, String endDate)async{
-    Dio dio = Dio();
-    var mapExpense = await dio.get(
-        "https://money-manager-snoozingturtle.herokuapp.com/api/user/1/incomes?pageSize=8&sortBy=dateAdded&sortOrder=DESC");
 
+  @override
+  Future<List<IncomeModel>> getIncome(String startDate, String endDate) async {
+    var token = await SecureStorage().getToken();
+    Api _xdio = Api(accessToken: token);
+    var mapIncome = await _xdio.api.get(INCOME_ENDPOINT);
     List map1 = [];
-    try{
-      map1 = mapExpense.data["expenses"];
-    }catch(e){
+    try {
+      map1 = mapIncome.data["dtoData"];
+    } catch (e) {
       debugPrint(e.toString());
     }
-    return map1.map((expense) => IncomeModel.fromSpringMap(expense)).toList();
+    return map1.map((income) => IncomeModel.fromSpringMap(income)).toList();
   }
 
   Future<void> addFromLocalBuffer(List<Map<String, Object?>> transactions) async {
-    Dio dio = Dio();
+    var token = await SecureStorage().getToken();
+    debugPrint('SPRING_DATA_S:76: TOKEN FROM SECURE STORAGE $token');
+    Api _xdio = Api(accessToken: token);
+
 
     for (var transaction in transactions) {
       Map<String, dynamic> map = {};
@@ -78,7 +88,7 @@ class SpringBootDataSource implements IDatasource {
           "description": transaction['note'],
           "type": transaction['medium'],
         };
-        await dio.post("https://money-manager-snoozingturtle.herokuapp.com/api/user/1/expenses", data: map);
+        await _xdio.api.post(EXPENSE_ENDPOINT, data: map);
       } else {
         map = {
           "amount": transaction['amount'],
@@ -86,10 +96,8 @@ class SpringBootDataSource implements IDatasource {
           "dateAdded": transaction['dateTime'],
           "description": transaction['note'],
         };
-        await dio.post("https://money-manager-snoozingturtle.herokuapp.com/api/user/1/incomes", data: map);
-
+        await _xdio.api.post(INCOME_ENDPOINT, data: map);
       }
     }
   }
-
 }

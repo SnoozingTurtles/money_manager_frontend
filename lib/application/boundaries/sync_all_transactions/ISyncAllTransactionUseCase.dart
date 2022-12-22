@@ -1,3 +1,4 @@
 abstract class ISyncAllTransactionUseCase{
-  Future<void> execute();
+  Future<void> executeLocalToRemote();
+  Future<void> executeRemoteToLocal();
 }

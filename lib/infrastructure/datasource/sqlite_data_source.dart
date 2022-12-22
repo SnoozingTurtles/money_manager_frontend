@@ -1,10 +1,13 @@
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/i_user_data_source.dart';
-import 'package:money_manager/infrastructure/model/model.dart';
+import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
+import 'package:money_manager/infrastructure/model/infra_user_model.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SqliteDataSource implements IDatasource, IUserDataSource {
+import '../../domain/value_objects/user/value_objects.dart';
+
+class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   final Database _db;
   const SqliteDataSource({required Database db}) : _db = db;
   @override
@@ -102,6 +105,13 @@ class SqliteDataSource implements IDatasource, IUserDataSource {
       balance: double.parse("${value[0]['balance']}"),
       income: double.parse("${value[0]['income']}"),
       expense: double.parse("${value[0]['expense']}"),
+      loggedIn: bool.fromEnvironment("${value[0]['loggedIn']}"),
     );
+  }
+
+  @override
+  Future<void> cleanDB()async {
+    await _db.execute("delete from income");
+    await _db.execute("delete from expense");
   }
 }
