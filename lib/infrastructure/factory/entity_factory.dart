@@ -16,7 +16,6 @@ class EntityFactory extends IEntityFactory {
       required bool recurring,
       required String medium}) {
     return Expense(
-      token:token,
       amount: amount,
       category: category,
       dateTime: dateTime,
@@ -38,7 +37,6 @@ class EntityFactory extends IEntityFactory {
       amount: amount,
       note: note,
       category: category,
-      token:token,
       dateTime: dateTime,
       recurring: recurring,
     );
@@ -59,10 +57,7 @@ class EntityFactory extends IEntityFactory {
       balance: balance,
       expense: expense,
       income: income,
-      token:token,
-      email:email,
       loggedIn: loggedIn,
-      remoteId: remoteId,
     );
   }
 }

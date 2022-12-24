@@ -49,9 +49,4 @@ class AuthPass extends AuthEvent{
   List<Object?> get props => [];
 }
 
-class SwitchAuthEvent extends AuthEvent{
-  const SwitchAuthEvent();
 
-  @override
-  List<Object?> get props => [];
-}

@@ -9,13 +9,11 @@ abstract class TransactionModel {
   Note? note;
   DateTime dateTime;
   bool recurring;
-  String? token;
 
   TransactionModel(
       {required this.amount,
         required this.category,
         this.note,
-        this.token,
         required this.dateTime,
         required this.recurring,
         required this.id});
@@ -28,11 +26,10 @@ class IncomeModel extends TransactionModel {
       {required Amount amount,
         required UserId id,
         required Category category,
-        String?token,
         Note? note,
         required DateTime dateTime,
         required bool recurring})
-      : super(token:token,amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
+      : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
 
   factory IncomeModel.fromMap(Map<String, dynamic> map) {
     return IncomeModel(
@@ -59,7 +56,6 @@ class IncomeModel extends TransactionModel {
       dateTime: dateTime,
       category: category,
       recurring: recurring,
-      token: token,
       note: note,
     );
   }
@@ -113,7 +109,7 @@ class ExpenseModel extends TransactionModel {
         required DateTime dateTime,
         required bool recurring,
         required this.medium})
-      : super(token:token,amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
+      : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
 
   @override
   String toString() {
@@ -148,7 +144,6 @@ class ExpenseModel extends TransactionModel {
       dateTime: dateTime,
       category: category,
       recurring: recurring,
-      token: token,
       note: note,
       medium: medium,
     );

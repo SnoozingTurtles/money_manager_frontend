@@ -4,20 +4,19 @@ import 'package:money_manager/common/diox.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
 
-import '../../common/secure_storage.dart';
 
 //only token usage in application is here get rid of token every where else ...
 class SpringBootDataSource implements IDatasource {
   @override
   Future<void> addExpense(ExpenseModel expense) async {
-    Api _xdio = Api(accessToken: expense.token);
+    Api _xdio = Api();
     Map<String, dynamic> map = expense.toSpringMap();
     await _xdio.api.post(EXPENSE_ENDPOINT, data: map);
   }
 
   @override
   Future<void> addIncome(IncomeModel income) async {
-    Api _xdio = Api(accessToken: income.token);
+    Api _xdio = Api();
     Map<String, dynamic> map = income.toSpringMap();
 
     await _xdio.api.post(INCOME_ENDPOINT, data: map);
@@ -44,8 +43,7 @@ class SpringBootDataSource implements IDatasource {
 
   @override
   Future<List<ExpenseModel>> getExpense(String startDate, String endDate) async {
-    var token = await SecureStorage().getToken();
-    Api _xdio = Api(accessToken: token);
+    Api _xdio = Api();
 
     var mapExpense = await _xdio.api.get(EXPENSE_ENDPOINT);
 
@@ -60,8 +58,7 @@ class SpringBootDataSource implements IDatasource {
 
   @override
   Future<List<IncomeModel>> getIncome(String startDate, String endDate) async {
-    var token = await SecureStorage().getToken();
-    Api _xdio = Api(accessToken: token);
+    Api _xdio = Api();
     var mapIncome = await _xdio.api.get(INCOME_ENDPOINT);
     List map1 = [];
     try {
@@ -73,11 +70,7 @@ class SpringBootDataSource implements IDatasource {
   }
 
   Future<void> addFromLocalBuffer(List<Map<String, Object?>> transactions) async {
-    var token = await SecureStorage().getToken();
-    debugPrint('SPRING_DATA_S:76: TOKEN FROM SECURE STORAGE $token');
-    Api _xdio = Api(accessToken: token);
-
-
+    Api _xdio = Api();
     for (var transaction in transactions) {
       Map<String, dynamic> map = {};
       if ((transaction['transactionType'] as String) == 'expense') {

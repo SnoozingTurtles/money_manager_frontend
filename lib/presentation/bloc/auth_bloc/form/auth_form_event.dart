@@ -18,3 +18,10 @@ class ChangePasswordEvent extends AuthFormEvent {
   @override
   List<Object?> get props => [password];
 }
+
+class SwitchAuthEvent extends AuthFormEvent{
+  const SwitchAuthEvent();
+
+  @override
+  List<Object?> get props => [];
+}

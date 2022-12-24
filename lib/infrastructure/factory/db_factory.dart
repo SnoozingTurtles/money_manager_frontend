@@ -25,8 +25,7 @@ class DatabaseFactory {
     balance NUMERIC,
     expense NUMERIC,
     income NUMERIC,
-    loggedIn TEXT,
-    remoteId INTEGER
+    loggedIn TEXT
     );""");
   }
   _createExpenseTable(Database db) async {

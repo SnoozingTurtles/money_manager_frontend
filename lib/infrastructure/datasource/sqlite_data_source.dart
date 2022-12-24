@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/i_user_data_source.dart';
@@ -48,6 +49,7 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   }
 
   Future<void> addBuffer(TransactionModel transaction) async {
+    debugPrint('ADDING TRANSACTION TO BUFFER: $transaction');
     if (transaction is IncomeModel) {
       await _db.insert('buffer', transaction.toBufferMap());
     } else if (transaction is ExpenseModel) {
@@ -88,7 +90,7 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   @override
   Future<int> generateUser() async {
     try {
-      int id = await _db.insert('user', {'name': 'User', 'balance': 0,'expense':0,'income':0});
+      int id = await _db.insert('user', {'name': 'User', 'balance': 0,'expense':0,'income':0,'loggedIn':'false'});
       print("Generated id  is $id");
       return id;
     } catch (e) {

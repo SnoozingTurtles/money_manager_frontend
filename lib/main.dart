@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/common/connectivity.dart';
+import 'package:money_manager/common/secure_storage.dart';
 import 'package:money_manager/infrastructure/datasource/spring_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
 import 'package:money_manager/infrastructure/factory/entity_factory.dart';
@@ -44,6 +45,7 @@ void main() async {
                     )..cleanIfFirstUseAfterUninstall()),
             RepositoryProvider<TransactionRepository>(
                 create: (context) => TransactionRepository(
+                    secureStorage: SecureStorage(),
                     localDatasource: SqliteDataSource(db: db),
                     connectivity: _connectivity,
                     remoteDatasource: SpringBootDataSource())),
@@ -59,6 +61,7 @@ void main() async {
                   create: (context) => AuthBloc(
                       RepositoryProvider.of<UserRepository>(context),
                       TransactionRepository(
+                          secureStorage: SecureStorage(),
                           localDatasource: SqliteDataSource(db: db),
                           connectivity: _connectivity,
                           remoteDatasource: SpringBootDataSource()))
@@ -71,37 +74,32 @@ void main() async {
                 ),
               ],
               child: BlocConsumer<AuthBloc, AuthState>(
-                listener: (context, authState) {},
+                listener: (context, state) {
+                },
                 builder: (context, authState) {
-                  print("Auth state is + ${authState}");
                   return MaterialApp(
                     theme: ThemeData(
                       textTheme: mTextTheme,
                     ),
-                    home: BlocConsumer<HomeBloc, HomeState>(
-                        listener: (context, state) {},
-                        builder: (context, state) {
-                          if (authState is AuthAuthenticated || authState is AuthPassed) {
-                            return BlocConsumer<UserBloc, UserState>(
-                              listener: (context, state) {
-                                // TODO: implement listener
-                              },
-                              builder: (context, state) {
-                                if (state is UserLoaded)
-                                  return DashBoard();
-                                else
-                                  return CircularProgressIndicator();
-                              },
-                            );
-                          } else if (authState is AuthLoading) {
-                            return CircularProgressIndicator();
-                          } else {
-                            return BlocProvider<AuthFormBloc>(
-                              create: (context) => AuthFormBloc(),
-                              child: AuthScreen(),
-                            );
-                          }
-                        }),
+                    home: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+                      if (authState is AuthAuthenticated || authState is AuthPassed) {
+                        return BlocBuilder<UserBloc, UserState>(
+                          builder: (context, state) {
+                            if (state is UserLoaded)
+                              return DashBoard();
+                            else
+                              return CircularProgressIndicator();
+                          },
+                        );
+                      } else if (authState is AuthLoading) {
+                        return CircularProgressIndicator();
+                      } else {
+                        return BlocProvider<AuthFormBloc>(
+                          create: (context) => AuthFormBloc(),
+                          child: AuthScreen(authState:authState as AuthUnauthenticated),
+                        );
+                      }
+                    }),
                     routes: {
                       TransactionView.route: (context) {
                         return BlocConsumer<UserBloc, UserState>(
@@ -139,13 +137,13 @@ class MyGlobalObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
-    debugPrint('${bloc.runtimeType} $event');
+    // debugPrint('${bloc.runtimeType} $event');
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    debugPrint('${bloc.runtimeType} $change');
+    // debugPrint('${bloc.runtimeType} $change');
   }
 
   @override

@@ -23,10 +23,9 @@ class Income extends Transaction {
       {required Amount amount,
       required Category category,
       Note? note,
-      String? token,
       required DateTime dateTime,
       required bool recurring})
-      : super(amount: amount, category: category, token: token, dateTime: dateTime, note: note, recurring: recurring);
+      : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring);
 
   @override
   // TODO: implement props
@@ -39,11 +38,10 @@ class Expense extends Transaction {
       {required Amount amount,
       required Category category,
       Note? note,
-      String? token,
       required DateTime dateTime,
       required bool recurring,
       required this.medium})
-      : super(amount: amount, category: category, token: token, dateTime: dateTime, note: note, recurring: recurring);
+      : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring);
 
   @override
   String toString() {

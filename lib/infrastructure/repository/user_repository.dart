@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:money_manager/domain/models/user_model.dart';
 import 'package:money_manager/domain/repositories/i_user_repository.dart';
 import 'package:money_manager/common/connectivity.dart';
@@ -45,26 +46,22 @@ class UserRepository implements IUserRepository, IAuthRepository {
     SecureStorage _secureStorage = SecureStorage();
     String? fE = email.email.fold((l) => null, (r) => r);
     String? fP = password.password.fold((l) => null, (r) => r);
-    var map = {
-      'email': fE,
-      'password': fP
-    };
+    var map = {'email': fE, 'password': fP};
     try {
       var response = await dio.post(
         LOGIN_ENDPOINT,
         data: map,
       );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        var body = response.data;
-        await _secureStorage.persistEmailAndToken(fE!, body['token'], '1');
-        return right(UserId(1));
-      } else if (response.statusCode == 401 || response.statusCode == 403) {
-        return left(Failure("Unauthorized"));
-      }
+      var body = response.data;
+      //TODO: IMPLEMENT REFRESH TOKEN
+      await _secureStorage.persistEmailAndToken(fE!, body['token'], '1', 'tempRefreshToken');
+      return right(UserId(1));
+    } on DioError catch (e) {
+      return left(Failure(e.response!.data['message']));
     } catch (e) {
+      debugPrint(e.toString());
       return left(Failure(e.toString()));
     }
-    return left(Failure("Some error occurred"));
   }
 
   @override
@@ -73,23 +70,15 @@ class UserRepository implements IUserRepository, IAuthRepository {
     String? fE = email.email.fold((l) => null, (r) => r);
     String? fP = password.password.fold((l) => null, (r) => r);
     Dio dio = Dio();
-    var map = {
-      'email': fE,
-      'password': fP,
-      'name': name
-    };
+    var map = {'email': fE, 'password': fP, 'name': name};
     try {
       var response = await dio.post(REGISTER_ENDPOINT, data: map);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        var body = response.data;
-        return right(UserId(1));
-      } else if (response.statusCode == 401 || response.statusCode == 403) {
-        return left(Failure("Unauthorized"));
-      }
+      return right(UserId(1));
+    } on DioError catch (e) {
+      return left(Failure(e.response!.data['message']));
     } catch (e) {
       return left(Failure(e.toString()));
     }
-    return left(Failure("Some error occurred"));
   }
 
   Future<void> cleanIfFirstUseAfterUninstall() async {

@@ -68,7 +68,6 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         state.copyWith(error: l.message);
         throw Exception(l.message);
       }, (r) => r);
-      print("After addtransaction use case load user");
     });
     on<ChangeAmountEvent>((event, emit) {
       emit(state.copyWith(amount: Amount(event.amount)));

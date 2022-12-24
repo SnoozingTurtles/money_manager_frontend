@@ -16,5 +16,13 @@ class AuthFormBloc extends Bloc<AuthFormEvent, AuthFormState> {
     on<ChangePasswordEvent>((event, emit) {
       emit(state.copyWith(password:Password(event.password)));
     });
+
+    on<SwitchAuthEvent>((event, emit) async {
+      if (state.signUp) {
+        emit(state.copyWith(signUp: false));
+      } else {
+        emit(state.copyWith(signUp:true));
+      }
+    });
   }
 }

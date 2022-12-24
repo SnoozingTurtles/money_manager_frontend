@@ -16,6 +16,8 @@ class AuthAuthenticated extends AuthState{
   List<Object> get props => [];
 }
 class AuthUnauthenticated extends AuthState{
+  final String error;
+  const AuthUnauthenticated({required this.error});
   @override
   List<Object> get props => [];
 }
@@ -24,14 +26,6 @@ class AuthPassed extends AuthState{
   List<Object> get props => [];
 }
 class AuthLoading extends AuthState{
-  @override
-  List<Object> get props => [];
-}
-class AuthSignIn extends AuthState{
-  @override
-  List<Object> get props => [];
-}
-class AuthSignUp extends AuthState{
   @override
   List<Object> get props => [];
 }

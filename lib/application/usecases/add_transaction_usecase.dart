@@ -19,7 +19,6 @@ class AddTransactionUseCase implements IAddTransactionUseCase {
   @override
   Future<Either<Failure, AddTransactionOutput>> execute(AddTransactionInput input) async {
     Transaction newTransaction = _createTransactionFromInput(input);
-    print(input.token);
     await _transactionRepository.add(newTransaction, input.id);
     return _buildOutputFromNewTransaction(newTransaction);
   }

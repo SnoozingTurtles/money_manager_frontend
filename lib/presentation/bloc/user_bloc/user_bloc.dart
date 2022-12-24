@@ -38,8 +38,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
     });
     on<LoadUser>((event, emit) async {
-      print("loading user");
-      emit(UserNotLoaded());
+      // print("loading user");
       User user = await _getUserUseCase.execute();
       emit(UserLoaded(user:user));
     });

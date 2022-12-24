@@ -19,6 +19,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetAllTransactionUseCase _getAllTransactionUseCase;
   final SyncAllTransactionUseCase _syncTransactionUseCase;
   late StreamSubscription<bool> subscription;
+  late var userSubscription;
   final UserBloc _userBloc;
   HomeBloc({required TransactionRepository transactionRepository, required UserBloc userBloc})
       : _getAllTransactionUseCase = GetAllTransactionUseCase(iTransactionRepository: transactionRepository),
@@ -26,12 +27,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         _userBloc = userBloc,
         super(HomeInitial()) {
     SecureStorage _secureStorage = SecureStorage();
-    // var token = (userBloc.state as UserLoaded).token;
     subscription = transactionRepository.connectivityStream.listen((event) async{
-      print("EVENT FROM STREAM");
-      print("Event is $event");
+      print("CONNECTIVITY EVENT is $event");
       if (event && await _secureStorage.hasToken()) {
-        print("has token thus logged in");
         add(const SyncTransactionEvent());
       }
     });
@@ -46,7 +44,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(HomeLoading());
       GetAllTransactionOutput getAllTransactionOutput = await _getAllTransactionUseCase.executeAllTime();
       var transactions = getAllTransactionOutput.transactions;
-      _reloadUserBalance(transactions.values);
+      await _reloadUserBalance(transactions.values);
       emit(HomeLoaded(transactions: transactions, syncLoading: false, filter: "All Time"));
     });
     on<LoadTransactionsThisMonthEvent>((event, emit) async {
@@ -91,7 +89,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
   }
 
-  void _reloadUserBalance(Iterable<List<TransactionDTO>> transactions) {
+  Future<void> _reloadUserBalance(Iterable<List<TransactionDTO>> transactions) async{
     double expense = 0, income = 0;
     for (var value in transactions) {
       for (var element in value) {

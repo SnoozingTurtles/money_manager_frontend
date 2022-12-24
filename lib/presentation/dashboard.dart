@@ -130,7 +130,6 @@ class _DashBoardState extends State<DashBoard> {
 
   @override
   void initState() {
-    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionEvent());
     super.initState();
   }
 }
