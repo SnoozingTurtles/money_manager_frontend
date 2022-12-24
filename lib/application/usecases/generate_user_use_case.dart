@@ -11,6 +11,6 @@ class GenerateUserUseCase{
 
   Future<User> execute() async{
     int id = await userRepository.generateUser();
-    return User(userId: UserId(id), balance: 0,expense:0,income:0,loggedIn: false);
+    return User(localId: UserId(id), balance: 0,expense:0,income:0,loggedIn: false);
   }
 }

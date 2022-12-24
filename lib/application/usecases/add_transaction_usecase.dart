@@ -7,6 +7,8 @@ import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/domain/value_objects/value_failure.dart';
 
+import '../../domain/value_objects/user/value_objects.dart';
+
 class AddTransactionUseCase implements IAddTransactionUseCase {
   final ITransactionRepository _transactionRepository;
   final IEntityFactory _entityFactory;
@@ -17,9 +19,9 @@ class AddTransactionUseCase implements IAddTransactionUseCase {
         _transactionRepository = transactionRepository;
 
   @override
-  Future<Either<Failure, AddTransactionOutput>> execute(AddTransactionInput input) async {
+  Future<Either<Failure, AddTransactionOutput>> execute({required AddTransactionInput input, UserId? remoteId}) async {
     Transaction newTransaction = _createTransactionFromInput(input);
-    await _transactionRepository.add(newTransaction, input.id);
+    await _transactionRepository.add(transaction:newTransaction,localId: input.id,remoteId: remoteId);
     return _buildOutputFromNewTransaction(newTransaction);
   }
 

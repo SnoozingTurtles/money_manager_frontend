@@ -26,12 +26,11 @@ class ReloadUser extends UserEvent{
   // TODO: implement props
   List<Object?> get props =>[balance,income,expense];
 }
-class EmailTokenEvent extends UserEvent{
-  final Email? email;
-  final String? token;
-  const EmailTokenEvent({required this.email, required this.token});
+class LogUserIn extends UserEvent{
+  final UserId remoteId;
+  const LogUserIn({required this.remoteId});
   @override
   // TODO: implement props
-  List<Object?> get props =>[];
+  List<Object?> get props =>[remoteId];
 }
 

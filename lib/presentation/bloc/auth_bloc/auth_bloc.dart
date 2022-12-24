@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../application/usecases/remove_all_transaction_usecase.dart';
 import '../../../common/secure_storage.dart';
 import '../../../infrastructure/repository/user_repository.dart';
+import '../user_bloc/user_bloc.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -19,9 +20,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final UserRepository _userRepository;
   final SyncAllTransactionUseCase syncAllTransactionUseCase;
   final RemoveAllTransactionUseCase removeAllTransactionUseCase;
+  final UserBloc _userBloc;
 
-  AuthBloc(UserRepository userRepository, TransactionRepository transactionRepository)
+  AuthBloc(UserRepository userRepository, TransactionRepository transactionRepository,UserBloc userBloc)
       : _userRepository = userRepository,
+        _userBloc = userBloc,
         syncAllTransactionUseCase = SyncAllTransactionUseCase(transactionRepository: transactionRepository),
         removeAllTransactionUseCase = RemoveAllTransactionUseCase(transactionRepository: transactionRepository),
         super(AuthUnauthenticated(error:'')) {
@@ -66,9 +69,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       Either<Failure,UserId> response = await _userRepository.signIn(email: event.email, password: event.password);
       if(response.isRight()) {
-        await syncAllTransactionUseCase.executeLocalToRemote();
+        var id = response.fold((l) => null, (r) => r);
+        _userBloc.add(LogUserIn(remoteId: id!));
+        await syncAllTransactionUseCase.executeLocalToRemote(remoteId: id);
         await removeAllTransactionUseCase.execute();
-        await syncAllTransactionUseCase.executeRemoteToLocal();
+        await syncAllTransactionUseCase.executeRemoteToLocal(remoteId: id);
         emit(const AuthAuthenticated());
       }else{
         String message = response.fold((l) => l.message, (r) => 'null');
@@ -79,7 +84,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // print('signup');
       emit(AuthLoading());
       Either<Failure,UserId> response = await _userRepository.signUp(email: event.email, password: event.password, name: event.name);
-      debugPrint("RESPONSE ON SIGNUP EVENT BLOC: $response");
+      debugPrint("RESPONSE ON SIGNUP AUTH BLOC: $response");
       if(response.isRight()) {
         add(SignInEvent(email: event.email, password: event.password));
       }else{

@@ -5,6 +5,6 @@ import '../value_objects/user/value_objects.dart';
 
 abstract class IUserRepository{
   Future<int> generateUser();
-  Future<int> addUser(User user);
+  Future<void> updateUserId({required UserId remoteId});
   Future<User> get(UserId id);
 }

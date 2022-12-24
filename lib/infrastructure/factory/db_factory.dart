@@ -25,7 +25,8 @@ class DatabaseFactory {
     balance NUMERIC,
     expense NUMERIC,
     income NUMERIC,
-    loggedIn TEXT
+    loggedIn TEXT,
+    remoteId INTEGER
     );""");
   }
   _createExpenseTable(Database db) async {
@@ -64,7 +65,7 @@ class DatabaseFactory {
 
   _createBufferTable(Database db)async{
     await db.execute("""CREATE TABLE buffer(
-    amount TEXT PRIMARY KEY,
+    amount TEXT ,
     category TEXT,
     note TEXT,
     dateTime TEXT,

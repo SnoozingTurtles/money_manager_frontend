@@ -30,6 +30,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       var balance = (_userBloc.state as UserLoaded).user.balance;
       var income = (_userBloc.state as UserLoaded).user.income;
       var expense = (_userBloc.state as UserLoaded).user.expense;
+      var remoteId = (_userBloc.state as UserLoaded).user.remoteId;
       var token = await SecureStorage().getToken();
       print("token in bloc $token");
       if (state.income) {
@@ -63,7 +64,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
             expense: expense + state.amount.value.fold((l) => 0, (r) => double.parse(r))));
       }
 
-      var output = await _addTransactionUseCase.execute(addTransactionInput);
+      var output = await _addTransactionUseCase.execute(input:addTransactionInput,remoteId: remoteId);
       output.fold((l) {
         state.copyWith(error: l.message);
         throw Exception(l.message);

@@ -79,7 +79,7 @@ class _TransactionViewState extends State<TransactionView> {
         onPressed: () async {
           if (formkey.currentState!.validate() && state.category.value.fold((l) => false, (r) => true)) {
             BlocProvider.of<TransactionBloc>(context).add(
-              AddTransaction(id: state.uid),
+              AddTransaction(id: state.localId),
             );
             BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
 

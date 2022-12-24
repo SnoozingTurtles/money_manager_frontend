@@ -12,26 +12,26 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   final Database _db;
   const SqliteDataSource({required Database db}) : _db = db;
   @override
-  Future<void> addTransaction(TransactionModel model) async {
+  Future<void> addTransaction({required TransactionModel model, UserId? remoteId}) async {
     // await _db.insert('transaction', model.toMap());
     if (model is ExpenseModel) {
-      await addExpense(model);
+      await addExpense(expense:model);
     } else if (model is IncomeModel) {
-      await addIncome(model);
+      await addIncome(income:model);
     }
   }
 
   @override
-  Future<List<TransactionModel>> get(String startDate, String endDate) async {
-    var listOfMapsExpenses = await getExpense(startDate, endDate);
-    var listOfMapsIncome = await getIncome(startDate,endDate);
+  Future<List<TransactionModel>> get({required String startDate,required String endDate, UserId? remoteId}) async {
+    var listOfMapsExpenses = await getExpense(startDate:startDate,endDate: endDate);
+    var listOfMapsIncome = await getIncome(startDate:startDate,endDate: endDate);
     var listOfMaps = [...listOfMapsIncome, ...listOfMapsExpenses];
     if (listOfMaps.isEmpty) return [];
     return listOfMaps;
   }
 
   @override
-  Future<void> addExpense(ExpenseModel expense) async {
+  Future<void> addExpense({required ExpenseModel expense,UserId? remoteId}) async {
     await _db.insert('expense', expense.toMap());
     double expenseAmount = expense.amount.value.fold((l) => 0, (r) => double.parse(r));
     UserModel user = await getUser(expense.id);
@@ -40,7 +40,7 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   }
 
   @override
-  Future<void> addIncome(IncomeModel income) async {
+  Future<void> addIncome({required IncomeModel income,UserId?remoteId}) async {
     await _db.insert('income', income.toMap());
     double incomeAmount = income.amount.value.fold((l) => 0, (r) => double.parse(r));
     UserModel user = await getUser(income.id);
@@ -69,22 +69,21 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   }
 
   @override
-  Future<List<ExpenseModel>> getExpense(String startDate, String endDate) async {
+  Future<List<ExpenseModel>> getExpense({required String startDate,required String endDate, UserId? remoteId}) async {
     var listOfMapsExpenses = await _db.query('expense',where:'dateTime between ? and ?',whereArgs: [startDate,endDate]);
     print(listOfMapsExpenses);
     return listOfMapsExpenses.map<ExpenseModel>((map) => ExpenseModel.fromMap(map)).toList();
   }
 
   @override
-  Future<List<IncomeModel>> getIncome(String startDate, String endDate) async {
+  Future<List<IncomeModel>> getIncome({required String startDate,required String endDate, UserId? remoteId}) async {
     var listOfMapIncome = await _db.query('income',where:'dateTime between ? and ?',whereArgs: [startDate,endDate]);
     return listOfMapIncome.map<IncomeModel>((map) => IncomeModel.fromMap(map)).toList();
   }
 
   @override
-  Future<int> addUser(UserModel user) {
-    // TODO: implement addUser
-    throw UnimplementedError();
+  Future<void> updateUserId({required UserId remoteId})async {
+    await _db.update('user',{'remoteId':remoteId.value},where: 'userId=?',whereArgs: [1]);
   }
 
   @override
@@ -103,7 +102,8 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   Future<UserModel> getUser(UserId id) async {
     final value = await _db.query('user', where: "userId = ?", whereArgs: [id.value]);
     return UserModel(
-      userId: UserId(value[0]['userId'] as int),
+      localId: UserId(value[0]['userId'] as int),
+      remoteId: value[0]['remoteId']!=null?UserId(value[0]['remoteId'] as int):null,
       balance: double.parse("${value[0]['balance']}"),
       income: double.parse("${value[0]['income']}"),
       expense: double.parse("${value[0]['expense']}"),

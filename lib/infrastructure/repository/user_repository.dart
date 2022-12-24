@@ -22,9 +22,8 @@ class UserRepository implements IUserRepository, IAuthRepository {
         _entityFactory = entityFactory;
 
   @override
-  Future<int> addUser(User user) {
-    // TODO: implement addUser
-    throw UnimplementedError();
+  Future<void> updateUserId({required UserId remoteId}) async{
+    await _localDatasource.updateUserId(remoteId:remoteId);
   }
 
   @override
@@ -37,7 +36,7 @@ class UserRepository implements IUserRepository, IAuthRepository {
   Future<User> get(UserId id) async {
     var val = await _localDatasource.getUser(id);
     return _entityFactory.newUser(
-        uid: val.userId, balance: val.balance, expense: val.expense, income: val.income, loggedIn: val.loggedIn);
+        uid: val.localId,remoteId:val.remoteId, balance: val.balance, expense: val.expense, income: val.income, loggedIn: val.loggedIn);
   }
 
   @override
@@ -53,9 +52,10 @@ class UserRepository implements IUserRepository, IAuthRepository {
         data: map,
       );
       var body = response.data;
+      debugPrint("USER REPO: 56: signIn: $body");
       //TODO: IMPLEMENT REFRESH TOKEN
       await _secureStorage.persistEmailAndToken(fE!, body['token'], '1', 'tempRefreshToken');
-      return right(UserId(1));
+      return right(UserId(body['userId']));
     } on DioError catch (e) {
       return left(Failure(e.response!.data['message']));
     } catch (e) {
@@ -73,7 +73,8 @@ class UserRepository implements IUserRepository, IAuthRepository {
     var map = {'email': fE, 'password': fP, 'name': name};
     try {
       var response = await dio.post(REGISTER_ENDPOINT, data: map);
-      return right(UserId(1));
+      debugPrint("USER REPO: 56: signUp: $response");
+      return right(UserId(response.data['id']));
     } on DioError catch (e) {
       return left(Failure(e.response!.data['message']));
     } catch (e) {

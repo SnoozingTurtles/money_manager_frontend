@@ -32,12 +32,12 @@ class TransactionRepository implements ITransactionRepository {
   }
 
   @override
-  Future<void> add(Transaction transaction, UserId id) async {
+  Future<void> add({required Transaction transaction,required UserId localId, UserId? remoteId}) async {
     //create DTO model for infra layer from incoming transaction.
     TransactionModel model;
     if (transaction is Expense) {
       model = ExpenseModel(
-          id: id,
+          id: localId,
           amount: transaction.amount,
           category: transaction.category,
           dateTime: transaction.dateTime,
@@ -47,7 +47,7 @@ class TransactionRepository implements ITransactionRepository {
           medium: transaction.medium);
     } else {
       model = IncomeModel(
-        id: id,
+        id: localId,
         amount: transaction.amount,
         category: transaction.category,
         dateTime: transaction.dateTime,
@@ -56,11 +56,14 @@ class TransactionRepository implements ITransactionRepository {
       );
     }
     //connectivity
-    await _localDatasource.addTransaction(model);
+    await _localDatasource.addTransaction(model:model);
 
     if (await _secureStorage.hasToken()) {
       if (_connectivity.hasConnection) {
-        await _remoteDatasource.addTransaction(model).onError((error, stackTrace) => _localDatasource.addBuffer(model));
+        await _remoteDatasource.addTransaction(model:model,remoteId: remoteId).onError((error, stackTrace)async {
+          debugPrint('TRANSACTION REPO:64:addT:$error');
+             await _localDatasource.addBuffer(model);
+        });
       } else {
         await _localDatasource.addBuffer(model);
       }
@@ -70,14 +73,14 @@ class TransactionRepository implements ITransactionRepository {
   }
 
   @override
-  Future<List<Transaction>> getLocal(String startDate, String endDate) async {
-    var transactions = await _localDatasource.get(startDate, endDate);
+  Future<List<Transaction>> getLocal({required String startDate,required String endDate,UserId? id}) async {
+    var transactions = await _localDatasource.get(startDate:startDate,endDate: endDate);
     return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
   }
 
   @override
-  Future<List<Transaction>> getRemote(String startDate, String endDate) async {
-    var transactions = await _remoteDatasource.get(startDate, endDate);
+  Future<List<Transaction>> getRemote({required String startDate,required String endDate,UserId? id}) async {
+    var transactions = await _remoteDatasource.get(startDate:startDate,endDate: endDate,remoteId:id);
     return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
   }
 
@@ -87,25 +90,25 @@ class TransactionRepository implements ITransactionRepository {
   }
 
   @override
-  Future<void> syncRemoteToLocal() async {
+  Future<void> syncRemoteToLocal({UserId? remoteId}) async {
     var startDate = DateTime.now().subtract(const Duration(days: 365));
     var endDate = DateTime.now();
-    var map = await _remoteDatasource.get(startDate.toIso8601String(), endDate.toIso8601String());
+    var map = await _remoteDatasource.get(startDate:startDate.toIso8601String(),endDate: endDate.toIso8601String(),remoteId:remoteId);
     // await _localDatasource.cleanDB();
     if (map.isNotEmpty) {
       for (var element in map) {
-        await _localDatasource.addTransaction(element);
+        await _localDatasource.addTransaction(model:element);
       }
     }
   }
 
   @override
-  Future<void> syncLocalToRemote() async {
+  Future<void> syncLocalToRemote({UserId? remoteId}) async {
     if (_connectivity.hasConnection) {
       var map = await getBuffer();
       print("SYNC LOCAL TO REMOTE EMPTY BUFFER IS : $map");
       try {
-        await _remoteDatasource.addFromLocalBuffer(map);
+        await _remoteDatasource.addFromLocalBuffer(transactions:map,remoteId:remoteId);
       } catch (e) {
         debugPrint('SYNC LOCAL TO REMOTE ERROR: $e');
         return;

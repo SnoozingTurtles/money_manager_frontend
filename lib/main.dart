@@ -61,10 +61,12 @@ void main() async {
                   create: (context) => AuthBloc(
                       RepositoryProvider.of<UserRepository>(context),
                       TransactionRepository(
-                          secureStorage: SecureStorage(),
+                        secureStorage: SecureStorage(),
                           localDatasource: SqliteDataSource(db: db),
                           connectivity: _connectivity,
-                          remoteDatasource: SpringBootDataSource()))
+                          remoteDatasource: SpringBootDataSource()),
+                    BlocProvider.of<UserBloc>(context),
+                  )
                     ..add(AuthInitialEvent()),
                 ),
                 BlocProvider<HomeBloc>(
@@ -81,7 +83,8 @@ void main() async {
                     theme: ThemeData(
                       textTheme: mTextTheme,
                     ),
-                    home: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+                    home: BlocBuilder<HomeBloc, HomeState>(
+                        builder: (context, state) {
                       if (authState is AuthAuthenticated || authState is AuthPassed) {
                         return BlocBuilder<UserBloc, UserState>(
                           builder: (context, state) {
@@ -111,7 +114,7 @@ void main() async {
                               return BlocProvider<TransactionBloc>(
                                 create: (context) => TransactionBloc(
                                     userBloc: BlocProvider.of<UserBloc>(context),
-                                    id: state.user.userId,
+                                    id: state.user.localId,
                                     iTransactionRepository: RepositoryProvider.of<TransactionRepository>(context),
                                     iEntityFactory: RepositoryProvider.of<EntityFactory>(context)),
                                 child: TransactionView(),
