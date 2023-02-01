@@ -3,10 +3,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:money_manager/domain/models/user_model.dart';
 import 'package:money_manager/domain/repositories/i_user_repository.dart';
-import 'package:money_manager/common/connectivity.dart';
 import 'package:money_manager/domain/value_objects/value_failure.dart';
 import 'package:money_manager/infrastructure/datasource/i_user_data_source.dart';
+import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../common/constants.dart';
 import '../../common/secure_storage.dart';
@@ -16,14 +17,13 @@ import '../factory/entity_factory.dart';
 
 class UserRepository implements IUserRepository, IAuthRepository {
   final ILocalUserDataSource _localDatasource;
-  final EntityFactory _entityFactory;
-  UserRepository({required ILocalUserDataSource localDatasource, required EntityFactory entityFactory})
-      : _localDatasource = localDatasource,
-        _entityFactory = entityFactory;
+  final EntityFactory _entityFactory = EntityFactory();
+
+  UserRepository({required Database db}) : _localDatasource = SqliteDataSource(db: db);
 
   @override
-  Future<void> updateUserId({required UserId remoteId}) async{
-    await _localDatasource.updateUserId(remoteId:remoteId);
+  Future<void> updateUserId({required UserId remoteId}) async {
+    await _localDatasource.updateUserId(remoteId: remoteId);
   }
 
   @override
@@ -36,7 +36,12 @@ class UserRepository implements IUserRepository, IAuthRepository {
   Future<User> get(UserId id) async {
     var val = await _localDatasource.getUser(id);
     return _entityFactory.newUser(
-        uid: val.localId,remoteId:val.remoteId, balance: val.balance, expense: val.expense, income: val.income, loggedIn: val.loggedIn);
+        uid: val.localId,
+        remoteId: val.remoteId,
+        balance: val.balance,
+        expense: val.expense,
+        income: val.income,
+        loggedIn: val.loggedIn);
   }
 
   @override
@@ -53,11 +58,10 @@ class UserRepository implements IUserRepository, IAuthRepository {
       );
       var body = response.data;
       debugPrint("USER REPO: 56: signIn: $body");
-      //TODO: IMPLEMENT REFRESH TOKEN
-      await _secureStorage.persistEmailAndToken(fE!, body['token'], '1', 'tempRefreshToken');
+      await _secureStorage.persistEmailAndToken(fE!, body['accessToken'], '1', body['refreshToken']);
       return right(UserId(body['userId']));
     } on DioError catch (e) {
-      return left(Failure(e.response!.data['message']));
+      return left(Failure(e.response?.data['message']));
     } catch (e) {
       debugPrint(e.toString());
       return left(Failure(e.toString()));
@@ -76,6 +80,8 @@ class UserRepository implements IUserRepository, IAuthRepository {
       debugPrint("USER REPO: 56: signUp: $response");
       return right(UserId(response.data['id']));
     } on DioError catch (e) {
+      debugPrint("USER REPO :78 : signUp : error:$e");
+      debugPrint(e.response.toString());
       return left(Failure(e.response!.data['message']));
     } catch (e) {
       return left(Failure(e.toString()));
