@@ -21,26 +21,26 @@ class AddTransactionUseCase implements IAddTransactionUseCase {
   @override
   Future<Either<Failure, AddTransactionOutput>> execute({required AddTransactionInput input, UserId? remoteId}) async {
     Transaction newTransaction = _createTransactionFromInput(input);
-    await _transactionRepository.add(transaction:newTransaction,localId: input.id,remoteId: remoteId);
+    await _transactionRepository.add(transaction: newTransaction, localId: input.id, remoteId: remoteId);
     return _buildOutputFromNewTransaction(newTransaction);
   }
 
   Transaction _createTransactionFromInput(AddTransactionInput input) {
     if (input is AddExpenseInput) {
       return _entityFactory.newExpense(
+          localId: input.id,
           amount: input.amount,
           category: input.category,
-          token:input.token,
           dateTime: input.dateTime,
           note: input.note,
           recurring: input.recurring,
           medium: "Cash");
     } else {
       return _entityFactory.newIncome(
+          localId: input.id,
           amount: input.amount,
           category: input.category,
           dateTime: input.dateTime,
-          token:input.token,
           recurring: input.recurring,
           note: input.note);
     }
@@ -48,15 +48,15 @@ class AddTransactionUseCase implements IAddTransactionUseCase {
 
   Either<Failure, AddTransactionOutput> _buildOutputFromNewTransaction(Transaction input) {
     AddTransactionOutput output;
-    if(input is Expense) {
-       output = AddExpenseOutput(
-        amount: input.amount,
-        category: input.category,
-        dateTime: input.dateTime,
-        note:input.note,
-        recurring: input.recurring,
-        medium: "Cash");
-    }else{
+    if (input is Expense) {
+      output = AddExpenseOutput(
+          amount: input.amount,
+          category: input.category,
+          dateTime: input.dateTime,
+          note: input.note,
+          recurring: input.recurring,
+          medium: "Cash");
+    } else {
       output = AddIncomeOutput(
         amount: input.amount,
         category: input.category,
