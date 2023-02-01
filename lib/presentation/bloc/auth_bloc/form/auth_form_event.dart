@@ -1,7 +1,7 @@
 part of 'auth_form_bloc.dart';
 
 @immutable
-abstract class AuthFormEvent {
+abstract class AuthFormEvent extends Equatable{
   const AuthFormEvent();
 }
 

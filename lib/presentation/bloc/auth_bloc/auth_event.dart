@@ -26,24 +26,20 @@ class SignUpEvent extends AuthEvent{
   List<Object?> get props => [email,password,name];
 }
 class SyncRemoteToLocal extends AuthEvent{
-  const SyncRemoteToLocal();
+  final UserId remoteId;
+  const SyncRemoteToLocal({required this.remoteId});
 
   @override
   List<Object?> get props => [];
 }class SyncLocalToRemote extends AuthEvent{
-  const SyncLocalToRemote();
+  final UserId remoteId;
+  const SyncLocalToRemote({required this.remoteId});
 
   @override
   List<Object?> get props => [];
 }
 class RemoveLocal extends AuthEvent{
   const RemoveLocal();
-
-  @override
-  List<Object?> get props => [];
-}
-class AuthPass extends AuthEvent{
-  const AuthPass();
 
   @override
   List<Object?> get props => [];

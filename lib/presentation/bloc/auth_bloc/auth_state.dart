@@ -4,28 +4,30 @@ abstract class AuthState extends Equatable {
   const AuthState();
 }
 
+///LOCAL STATE
 class AuthUninitialized extends AuthState {
   @override
   List<Object> get props => [];
 }
-class AuthAuthenticated extends AuthState{
+
+class AuthAuthenticated extends AuthState {
   // final String jwtToken,email;
-  const AuthAuthenticated();
+  final UserId remoteId;
+  const AuthAuthenticated({required this.remoteId});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [remoteId];
 }
-class AuthUnauthenticated extends AuthState{
+
+class AuthUnauthenticated extends AuthState {
   final String error;
   const AuthUnauthenticated({required this.error});
   @override
   List<Object> get props => [];
 }
-class AuthPassed extends AuthState{
-  @override
-  List<Object> get props => [];
-}
-class AuthLoading extends AuthState{
+
+///LOCAL STATE AUTH SCREEN USAGE ONLY
+class AuthLoading extends AuthState {
   @override
   List<Object> get props => [];
 }
