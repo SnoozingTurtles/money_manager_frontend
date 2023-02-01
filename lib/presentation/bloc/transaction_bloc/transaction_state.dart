@@ -37,13 +37,13 @@ class TransactionState extends Equatable {
       required this.error,
       required this.commiting});
 
-  factory TransactionState.initial(UserId id) {
+  factory TransactionState.initial(UserId localId) {
     return TransactionState(
         amount: Amount(""),
         category: Category(""),
         income: false,
         dateTime: DateTime.now(),
-        localId: id,
+        localId: localId,
         medium: "Cash",
         recurring: false,
         error: "",

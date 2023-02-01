@@ -1,38 +1,29 @@
 import 'package:flutter/cupertino.dart';
-import 'package:money_manager/common/connectivity.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:money_manager/common/secure_storage.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/infrastructure/datasource/spring_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
 import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
+import 'package:sqflite/sqflite.dart' as sql;
 
 import '../../domain/value_objects/user/value_objects.dart';
 
 class TransactionRepository implements ITransactionRepository {
   final SqliteDataSource _localDatasource;
   final SpringBootDataSource _remoteDatasource;
-  final ConnectivitySingleton _connectivity;
-  final SecureStorage _secureStorage;
+  final InternetConnectionChecker _connectivity = InternetConnectionChecker();
+  final SecureStorage _secureStorage = SecureStorage();
 
-  TransactionRepository(
-      {required SqliteDataSource localDatasource,
-      required SpringBootDataSource remoteDatasource,
-        required SecureStorage secureStorage,
-      required ConnectivitySingleton connectivity})
-      : _localDatasource = localDatasource,
-        _remoteDatasource = remoteDatasource,
-        _secureStorage = secureStorage,
-        _connectivity = connectivity;
+  TransactionRepository({required sql.Database db})
+      : _localDatasource = SqliteDataSource(db: db),
+        _remoteDatasource = SpringBootDataSource();
 
-  Stream<bool> get connectivityStream => _connectivity.connectionChange;
 
-  void dispose() {
-    _connectivity.dispose();
-  }
 
   @override
-  Future<void> add({required Transaction transaction,required UserId localId, UserId? remoteId}) async {
+  Future<void> add({required Transaction transaction, required UserId localId, UserId? remoteId}) async {
     //create DTO model for infra layer from incoming transaction.
     TransactionModel model;
     if (transaction is Expense) {
@@ -56,31 +47,32 @@ class TransactionRepository implements ITransactionRepository {
       );
     }
     //connectivity
-    await _localDatasource.addTransaction(model:model);
+    await _localDatasource.addTransaction(model: model);
 
     if (await _secureStorage.hasToken()) {
-      if (_connectivity.hasConnection) {
-        await _remoteDatasource.addTransaction(model:model,remoteId: remoteId).onError((error, stackTrace)async {
+      if (await _connectivity.hasConnection) {
+        debugPrint("TRANSACTION REPO:54:addT:hasToken and hasConnection");
+        await _remoteDatasource.addTransaction(model: model, remoteId: remoteId).onError((error, stackTrace) async {
           debugPrint('TRANSACTION REPO:64:addT:$error');
-             await _localDatasource.addBuffer(model);
+          await _localDatasource.addBuffer(model);
         });
       } else {
         await _localDatasource.addBuffer(model);
       }
     } else {
-       await _localDatasource.addBuffer(model);
+      await _localDatasource.addBuffer(model);
     }
   }
 
   @override
-  Future<List<Transaction>> getLocal({required String startDate,required String endDate,UserId? id}) async {
-    var transactions = await _localDatasource.get(startDate:startDate,endDate: endDate);
+  Future<List<Transaction>> getLocal({required String startDate, required String endDate, UserId? id}) async {
+    var transactions = await _localDatasource.get(startDate: startDate, endDate: endDate);
     return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
   }
 
   @override
-  Future<List<Transaction>> getRemote({required String startDate,required String endDate,UserId? id}) async {
-    var transactions = await _remoteDatasource.get(startDate:startDate,endDate: endDate,remoteId:id);
+  Future<List<Transaction>> getRemote({required String startDate, required String endDate, UserId? id}) async {
+    var transactions = await _remoteDatasource.get(startDate: startDate, endDate: endDate, remoteId: id);
     return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
   }
 
@@ -93,22 +85,23 @@ class TransactionRepository implements ITransactionRepository {
   Future<void> syncRemoteToLocal({UserId? remoteId}) async {
     var startDate = DateTime.now().subtract(const Duration(days: 365));
     var endDate = DateTime.now();
-    var map = await _remoteDatasource.get(startDate:startDate.toIso8601String(),endDate: endDate.toIso8601String(),remoteId:remoteId);
+    var map = await _remoteDatasource.get(
+        startDate: startDate.toIso8601String(), endDate: endDate.toIso8601String(), remoteId: remoteId);
     // await _localDatasource.cleanDB();
     if (map.isNotEmpty) {
       for (var element in map) {
-        await _localDatasource.addTransaction(model:element);
+        await _localDatasource.addTransaction(model: element);
       }
     }
   }
 
   @override
   Future<void> syncLocalToRemote({UserId? remoteId}) async {
-    if (_connectivity.hasConnection) {
+    if (await _connectivity.hasConnection) {
       var map = await getBuffer();
       print("SYNC LOCAL TO REMOTE EMPTY BUFFER IS : $map");
       try {
-        await _remoteDatasource.addFromLocalBuffer(transactions:map,remoteId:remoteId);
+        await _remoteDatasource.addFromLocalBuffer(transactions: map, remoteId: remoteId);
       } catch (e) {
         debugPrint('SYNC LOCAL TO REMOTE ERROR: $e');
         return;

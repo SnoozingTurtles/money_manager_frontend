@@ -3,6 +3,8 @@ import 'dart:collection';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:money_manager/application/boundaries/get_transactions/get_transaction_output.dart';
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
 import 'package:money_manager/application/usecases/get_transaction_usecase.dart';
@@ -18,18 +20,17 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetAllTransactionUseCase _getAllTransactionUseCase;
   final SyncAllTransactionUseCase _syncTransactionUseCase;
-  late StreamSubscription<bool> subscription;
-  late var userSubscription;
+  late StreamSubscription<InternetConnectionStatus> subscription;
   final UserBloc _userBloc;
   HomeBloc({required TransactionRepository transactionRepository, required UserBloc userBloc})
       : _getAllTransactionUseCase = GetAllTransactionUseCase(iTransactionRepository: transactionRepository),
         _syncTransactionUseCase = SyncAllTransactionUseCase(transactionRepository: transactionRepository),
         _userBloc = userBloc,
         super(HomeInitial()) {
-    SecureStorage _secureStorage = SecureStorage();
-    subscription = transactionRepository.connectivityStream.listen((event) async{
-      print("CONNECTIVITY EVENT is $event");
-      if (event && await _secureStorage.hasToken()) {
+    SecureStorage secureStorage = SecureStorage();
+    subscription = InternetConnectionChecker().onStatusChange.listen((status) async {
+      debugPrint("CONNECTIVITY EVENT is $status");
+      if (status == InternetConnectionStatus.connected && await secureStorage.hasToken()) {
         add(const SyncTransactionEvent());
       }
     });
@@ -84,12 +85,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(HomeLoaded(
           transactions: transactions,
           syncLoading: false,
-          filter:
-              "${event.startDate.toString().substring(0, 10)} to ${event.endDate.toString().substring(0, 10)}"));
+          filter: "${event.startDate.toString().substring(0, 10)} to ${event.endDate.toString().substring(0, 10)}"));
     });
   }
 
-  Future<void> _reloadUserBalance(Iterable<List<TransactionDTO>> transactions) async{
+  Future<void> _reloadUserBalance(Iterable<List<TransactionDTO>> transactions) async {
     double expense = 0, income = 0;
     for (var value in transactions) {
       for (var element in value) {
@@ -100,6 +100,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       }
     }
-    _userBloc.add(ReloadUser(balance: income - expense, income: income, expense: expense));
+    _userBloc.add(ReloadUserBalance(balance: income - expense, income: income, expense: expense));
   }
 }

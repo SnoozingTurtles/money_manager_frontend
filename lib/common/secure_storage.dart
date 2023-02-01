@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorage {
@@ -15,11 +16,13 @@ class SecureStorage {
 
   Future<void> persistEmailAndToken(String email, String token, String id,String refreshTokenKey) async {
     await _storage.write(key: _emailKey, value: email);
-    await _storage.write(key: _tokenKey, value: token);
+    await setToken(token);
     await _storage.write(key: _idKey, value: id);
     await _storage.write(key: _refreshTokenKey, value: refreshTokenKey);
   }
-
+  Future<void> setToken(String token) async{
+    await _storage.write(key: _tokenKey,value:token);
+  }
   Future<bool> hasToken() async {
     var value = await _storage.read(key: _tokenKey);
     return value != null;
@@ -27,6 +30,8 @@ class SecureStorage {
 
   Future<bool> hasRefreshToken() async {
     var value = await _storage.read(key: _refreshTokenKey);
+    var tok = await _storage.read(key: _tokenKey);
+    debugPrint('SECURESTORAGE ${value} :::: $tok');
     return value != null;
   }
 
@@ -41,6 +46,7 @@ class SecureStorage {
   }
 
   Future<void> deleteToken() async {
+    await _storage.delete(key:_refreshTokenKey);
     return await _storage.delete(key: _tokenKey);
   }
 
