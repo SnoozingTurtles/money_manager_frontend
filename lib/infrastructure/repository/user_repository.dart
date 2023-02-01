@@ -36,7 +36,7 @@ class UserRepository implements IUserRepository, IAuthRepository {
   Future<User> get(UserId id) async {
     var val = await _localDatasource.getUser(id);
     return _entityFactory.newUser(
-        uid: val.localId,
+        localId: val.localId,
         remoteId: val.remoteId,
         balance: val.balance,
         expense: val.expense,

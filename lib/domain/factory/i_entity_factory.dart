@@ -6,17 +6,17 @@ import '../value_objects/user/value_objects.dart';
 
 abstract class IEntityFactory {
   Income newIncome(
-      {required Amount amount,
+      {required UserId localId,
+      required Amount amount,
       Note? note,
-      String? token,
       required Category category,
       required DateTime dateTime,
       required bool recurring});
 
   Expense newExpense({
+    required UserId localId,
     required Amount amount,
     Note? note,
-    String? token,
     required Category category,
     required DateTime dateTime,
     required bool recurring,
@@ -24,7 +24,7 @@ abstract class IEntityFactory {
   });
 
   User newUser({
-    required UserId uid,
+    required UserId localId,
     required double balance,
     required double expense,
     required double income,

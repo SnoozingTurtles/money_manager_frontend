@@ -20,25 +20,22 @@ class TransactionRepository implements ITransactionRepository {
       : _localDatasource = SqliteDataSource(db: db),
         _remoteDatasource = SpringBootDataSource();
 
-
-
   @override
   Future<void> add({required Transaction transaction, required UserId localId, UserId? remoteId}) async {
     //create DTO model for infra layer from incoming transaction.
-    TransactionModel model;
+    Transaction model;
     if (transaction is Expense) {
-      model = ExpenseModel(
-          id: localId,
+      model = Expense(
+          localId: localId,
           amount: transaction.amount,
           category: transaction.category,
           dateTime: transaction.dateTime,
-          token: transaction.token,
           recurring: transaction.recurring,
           note: transaction.note,
           medium: transaction.medium);
     } else {
-      model = IncomeModel(
-        id: localId,
+      model = Income(
+        localId: localId,
         amount: transaction.amount,
         category: transaction.category,
         dateTime: transaction.dateTime,
@@ -67,13 +64,13 @@ class TransactionRepository implements ITransactionRepository {
   @override
   Future<List<Transaction>> getLocal({required String startDate, required String endDate, UserId? id}) async {
     var transactions = await _localDatasource.get(startDate: startDate, endDate: endDate);
-    return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
+    return transactions.map((e) => e is Expense ? e.toDExpense() : (e as Income).toDIncome()).toList();
   }
 
   @override
   Future<List<Transaction>> getRemote({required String startDate, required String endDate, UserId? id}) async {
     var transactions = await _remoteDatasource.get(startDate: startDate, endDate: endDate, remoteId: id);
-    return transactions.map((e) => e is ExpenseModel ? e.toDExpense() : (e as IncomeModel).toDIncome()).toList();
+    return transactions.map((e) => e is Expense ? e.toDExpense() : (e as Income).toDIncome()).toList();
   }
 
   @override

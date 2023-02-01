@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/cupertino.dart';
 import 'package:money_manager/application/boundaries/get_transactions/i_get_all_transaction_usecase.dart';
 import 'package:money_manager/application/boundaries/get_transactions/get_transaction_output.dart';
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
@@ -64,14 +65,24 @@ class GetAllTransactionUseCase implements IGetTransactionUseCase {
     return await _generateOutput(startDate, endDate);
 
   }
+  ///TEST FUNCTION
+  Future<List<Transaction>> executeThisMonthTest() async{
+    String startDate = DateTime.now().subtract(const Duration(days:30)).toIso8601String();
+    String endDate = DateTime.now().add(const Duration(days: 360)).toIso8601String();
+    var transactions =await _transactionRepository.getLocal(startDate:startDate,endDate: endDate);
+
+    return transactions;
+
+  }
+
 
   Future<GetAllTransactionOutput> _generateOutput(String startDate, String endDate) async{
     var transactions =await _transactionRepository.getLocal(startDate:startDate,endDate: endDate);
-
     var test = transactions.groupBy((p0) => p0.dateTime.toString().substring(0,10));
     var output =  test.map((key, value) => MapEntry(key, test[key]!.map((e) => e is Expense? ExpenseDTO.fromEntity(e):IncomeDTO.fromEntity(e),).toList()));
 
     return GetAllTransactionOutput(transactions: SplayTreeMap.from(output));
   }
+
 }
 

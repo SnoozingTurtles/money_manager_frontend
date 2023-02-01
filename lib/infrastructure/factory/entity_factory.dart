@@ -9,6 +9,7 @@ class EntityFactory extends IEntityFactory {
   @override
   Expense newExpense(
       {required Amount amount,
+      required UserId localId,
       Note? note,
       required Category category,
       required DateTime dateTime,
@@ -17,6 +18,7 @@ class EntityFactory extends IEntityFactory {
       required String medium}) {
     return Expense(
       amount: amount,
+      localId: localId,
       category: category,
       dateTime: dateTime,
       note: note,
@@ -29,11 +31,13 @@ class EntityFactory extends IEntityFactory {
   Income newIncome(
       {required Amount amount,
       Note? note,
+      required UserId localId,
       required Category category,
       String? token,
       required DateTime dateTime,
       required bool recurring}) {
     return Income(
+      localId: localId,
       amount: amount,
       note: note,
       category: category,
@@ -44,14 +48,14 @@ class EntityFactory extends IEntityFactory {
 
   @override
   User newUser(
-      {required UserId uid,
+      {required UserId localId,
       required double balance,
       required double expense,
       required double income,
       required bool loggedIn,
       UserId? remoteId}) {
     return User(
-      localId: uid,
+      localId: localId,
       remoteId: remoteId,
       balance: balance,
       expense: expense,
