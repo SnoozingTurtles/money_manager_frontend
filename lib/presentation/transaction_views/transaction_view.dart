@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/infrastructure/factory/entity_factory.dart';
+import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 import 'package:money_manager/presentation/bloc/transaction_bloc/transaction_bloc.dart';
-
 import '../bloc/home_bloc/home_bloc.dart';
+import '../bloc/user_bloc/user_bloc.dart';
 
 List<String> months = [
   "January",
@@ -20,8 +22,19 @@ List<String> months = [
   "December",
 ];
 
+Set<String> category = {
+  "Clothing",
+  "Education",
+  "Entertainment",
+  "Food",
+  "Fuel",
+  "Grooming",
+  "Health",
+  "Salary",
+};
+
 class TransactionView extends StatefulWidget {
-  static const String route = "transaction_view";
+  static const String route = "/TransactionScreen";
   const TransactionView({Key? key}) : super(key: key);
   static bool expense = true;
   @override
@@ -29,60 +42,75 @@ class TransactionView extends StatefulWidget {
 }
 
 class _TransactionViewState extends State<TransactionView> {
-  static final formkey = GlobalKey<FormState>();
-  static var innerKey = GlobalKey<FormState>();
+  static final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TransactionBloc, TransactionState>(
-      builder: (context, state) {
-        if (state.commiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("Add Transaction"),
-            ),
-            body: Form(
-              key: formkey,
-              autovalidateMode: AutovalidateMode.always,
-              child: ListView(
-                padding: const EdgeInsets.all(8),
-                children: [
-                  _buildExpenseFormField(state, context),
-                  FutureBuilder<ListTile>(
-                    future: _buildCalendarFormField(context, state),
-                    builder: (context, snapshot) => snapshot.hasData ? snapshot.data! : const ListTile(),
-                  ),
-                  _buildNoteFormField(state, context),
-                  _buildSwitches(state, context),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildCategoryPicker(state, context),
-                      _buildSaveButton(state, context),
-                    ],
-                  )
-                ],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<HomeBloc>(
+          create: (context) => HomeBloc(
+              transactionRepository: RepositoryProvider.of<TransactionRepository>(context),
+              userBloc: BlocProvider.of<UserBloc>(context)),
+        ),
+        BlocProvider<TransactionBloc>(
+          create: (context) => TransactionBloc(
+              userBloc: BlocProvider.of<UserBloc>(context),
+              iEntityFactory: EntityFactory(),
+              localId: (BlocProvider.of<UserBloc>(context).state as UserLoaded).localId,
+              iTransactionRepository: RepositoryProvider.of<TransactionRepository>(context)),
+        ),
+      ],
+      child: BlocBuilder<TransactionBloc, TransactionState>(
+        builder: (context, state) {
+          if (state.commiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text("Add Transaction"),
               ),
-            ),
-          );
-        }
-      },
+              body: Form(
+                key: formKey,
+                autovalidateMode: AutovalidateMode.always,
+                child: ListView(
+                  padding: const EdgeInsets.all(8),
+                  children: [
+                    _buildExpenseFormField(state, context),
+                    FutureBuilder<ListTile>(
+                      future: _buildCalendarFormField(context, state),
+                      builder: (context, snapshot) => snapshot.hasData ? snapshot.data! : const ListTile(),
+                    ),
+                    _buildNoteFormField(state, context),
+                    _buildSwitches(state, context),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildCategoryPicker(state, context),
+                        _buildSaveButton(state, context),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
   ElevatedButton _buildSaveButton(TransactionState state, BuildContext context) {
     return ElevatedButton(
         onPressed: () async {
-          if (formkey.currentState!.validate() && state.category.value.fold((l) => false, (r) => true)) {
+          if (formKey.currentState!.validate() && state.category.value.fold((l) => false, (r) => true)) {
             BlocProvider.of<TransactionBloc>(context).add(
               AddTransaction(id: state.localId),
             );
             BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
-
+            // BlocProvider.of<AuthBloc>(context).add(const AuthInitialEvent());
             Navigator.pop(context);
           } else if (state.category.value.fold((l) => true, (r) => false)) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -100,35 +128,7 @@ class _TransactionViewState extends State<TransactionView> {
         await showDialog(
           context: context,
           builder: (ctx) {
-            return Form(
-              key: innerKey,
-              autovalidateMode: AutovalidateMode.disabled,
-              child: AlertDialog(
-                title: const Text("Enter what you payed for"),
-                content: TextFormField(
-                  initialValue: state.category.value.fold((l) => "", (r) => r),
-                  validator: (value) {
-                    return state.category.value.fold((l) => l.message, (r) => null);
-                  },
-                  onChanged: (value) {
-                    BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: value));
-                  },
-                ),
-                actions: [
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Ok")),
-                  ElevatedButton(
-                      onPressed: () {
-                        BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: ""));
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Cancel")),
-                ],
-              ),
-            );
+            return CategoryPicker(state: state, context: context);
           },
         );
       },
@@ -229,4 +229,93 @@ InputDecoration mInputDecoration(String label) {
       borderRadius: BorderRadius.circular(12),
     ),
   );
+}
+
+class CategoryPicker extends StatefulWidget {
+  final TransactionState state;
+  final BuildContext context;
+  const CategoryPicker({Key? key, required this.state, required this.context}) : super(key: key);
+
+  @override
+  State<CategoryPicker> createState() => _CategoryPickerState();
+}
+
+class _CategoryPickerState extends State<CategoryPicker> {
+  String selectedCategory = "";
+  bool showAdder = false;
+  static var innerKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: BlocProvider.of<TransactionBloc>(widget.context),
+      child: BlocBuilder<TransactionBloc, TransactionState>(
+        builder: (context, state) {
+          return Form(
+            key: innerKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: AlertDialog(
+              title: const Text("Pick a category that best describes your transaction"),
+              content: Wrap(spacing: 5.0, children: [
+                ...category.map((categoryText) {
+                  selectedCategory = state.category.value.fold((l) => "", (r) => r);
+                  return InputChip(
+                    label: Text(categoryText),
+                    selected: selectedCategory == categoryText,
+                    onSelected: (value) {
+                      if (selectedCategory == categoryText) {
+                        BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: ""));
+                      } else {
+                        BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: categoryText));
+                      }
+                    },
+                  );
+                }).toList(),
+                Row(children: [
+                  if (showAdder)
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: state.category.value.fold((l) => "", (r) => r),
+                        validator: (value) {
+                          return state.category.value.fold((l) => l.message, (r) => null);
+                        },
+                        onChanged: (value) {
+                          selectedCategory = value;
+                          BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: value));
+                        },
+                        decoration: mInputDecoration("Category"),
+                      ),
+                    ),
+                  IconButton(
+                      icon: Icon(Icons.add_circle_outline_rounded),
+                      onPressed: () async {
+                        setState(() {
+                          showAdder = !showAdder;
+                        });
+                      }),
+                ]),
+              ]),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      if (innerKey.currentState!.validate() && state.category.value.fold((l) => false, (r) => true)) {
+                        if (selectedCategory != "") {
+                          category.add(selectedCategory);
+                        }
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text("Ok")),
+                ElevatedButton(
+                    onPressed: () {
+                      BlocProvider.of<TransactionBloc>(context).add(const ChangeCategoryEvent(category: ""));
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Cancel")),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
