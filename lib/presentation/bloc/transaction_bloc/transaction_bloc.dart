@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:money_manager/application/boundaries/add_transaction/add_transaction_input.dart';
 import 'package:money_manager/application/usecases/add_transaction_usecase.dart';
 import 'package:money_manager/common/secure_storage.dart';
@@ -16,23 +17,22 @@ part 'transaction_state.dart';
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final AddTransactionUseCase _addTransactionUseCase;
   UserBloc _userBloc;
-  TransactionBloc(
-      {required ITransactionRepository iTransactionRepository,
-      required IEntityFactory iEntityFactory,
-      required UserBloc userBloc,
-      required UserId id})
-      : _userBloc = userBloc,
+  TransactionBloc({
+    required ITransactionRepository iTransactionRepository,
+    required IEntityFactory iEntityFactory,
+    required UserBloc userBloc,
+    required UserId localId,
+  })  : _userBloc = userBloc,
         _addTransactionUseCase =
             AddTransactionUseCase(transactionRepository: iTransactionRepository, entityFactory: iEntityFactory),
-        super(TransactionState.initial(id)) {
+        super(TransactionState.initial(localId)) {
     on<AddTransaction>((event, emit) async {
       AddTransactionInput addTransactionInput;
-      var balance = (_userBloc.state as UserLoaded).user.balance;
-      var income = (_userBloc.state as UserLoaded).user.income;
-      var expense = (_userBloc.state as UserLoaded).user.expense;
-      var remoteId = (_userBloc.state as UserLoaded).user.remoteId;
+      var balance = (_userBloc.state as UserLoaded).balance;
+      var income = (_userBloc.state as UserLoaded).income;
+      var expense = (_userBloc.state as UserLoaded).expense;
+      var remoteId = (_userBloc.state as UserLoaded).remoteId;
       var token = await SecureStorage().getToken();
-      print("token in bloc $token");
       if (state.income) {
         addTransactionInput = AddIncomeInput(
             amount: state.amount,
@@ -43,7 +43,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
             note: state.note,
             recurring: state.recurring);
         balance += state.amount.value.fold((l) => 0, (r) => double.parse(r));
-        _userBloc.add(ReloadUser(
+        _userBloc.add(ReloadUserBalance(
             balance: balance,
             expense: expense,
             income: income + state.amount.value.fold((l) => 0, (r) => double.parse(r))));
@@ -58,13 +58,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
             note: state.note,
             medium: state.medium);
         balance -= state.amount.value.fold((l) => 0, (r) => double.parse(r));
-        _userBloc.add(ReloadUser(
+        _userBloc.add(ReloadUserBalance(
             balance: balance,
             income: income,
             expense: expense + state.amount.value.fold((l) => 0, (r) => double.parse(r))));
       }
 
-      var output = await _addTransactionUseCase.execute(input:addTransactionInput,remoteId: remoteId);
+      var output = await _addTransactionUseCase.execute(input: addTransactionInput, remoteId: remoteId);
       output.fold((l) {
         state.copyWith(error: l.message);
         throw Exception(l.message);

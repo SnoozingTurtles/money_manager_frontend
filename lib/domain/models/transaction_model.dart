@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
 abstract class Transaction extends Equatable {
-  Amount amount;
-  Category category; //Income category
-  Note? note;
-  DateTime dateTime;
-  bool recurring;
-  String? token;
+  final Amount amount;
+  final Category category; //Income category
+  final Note? note;
+  final DateTime dateTime;
+  final bool recurring;
+  final String? token;
 
   Transaction(
       {required this.amount,
@@ -33,7 +33,7 @@ class Income extends Transaction {
 }
 
 class Expense extends Transaction {
-  String medium; //account, cash, card
+  final String medium; //account, cash, card
   Expense(
       {required Amount amount,
       required Category category,

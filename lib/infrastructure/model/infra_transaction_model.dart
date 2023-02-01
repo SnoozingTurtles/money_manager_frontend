@@ -12,23 +12,21 @@ abstract class TransactionModel {
 
   TransactionModel(
       {required this.amount,
-        required this.category,
-        this.note,
-        required this.dateTime,
-        required this.recurring,
-        required this.id});
-
+      required this.category,
+      this.note,
+      required this.dateTime,
+      required this.recurring,
+      required this.id});
 }
-
 
 class IncomeModel extends TransactionModel {
   IncomeModel(
       {required Amount amount,
-        required UserId id,
-        required Category category,
-        Note? note,
-        required DateTime dateTime,
-        required bool recurring})
+      required UserId id,
+      required Category category,
+      Note? note,
+      required DateTime dateTime,
+      required bool recurring})
       : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
 
   factory IncomeModel.fromMap(Map<String, dynamic> map) {
@@ -50,7 +48,7 @@ class IncomeModel extends TransactionModel {
         note: map['description'] == null ? null : Note(map['description']!));
   }
 
-  Income toDIncome(){
+  Income toDIncome() {
     return Income(
       amount: amount,
       dateTime: dateTime,
@@ -59,6 +57,7 @@ class IncomeModel extends TransactionModel {
       note: note,
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       "userId": id.value,
@@ -91,24 +90,19 @@ class IncomeModel extends TransactionModel {
       "transactionType": "income",
     };
   }
-
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
 }
-
 
 class ExpenseModel extends TransactionModel {
   String medium; //account, cash, card
   ExpenseModel(
       {required Amount amount,
-        required UserId id,
-        required Category category,
-        Note? note,
-        String?token,
-        required DateTime dateTime,
-        required bool recurring,
-        required this.medium})
+      required UserId id,
+      required Category category,
+      Note? note,
+      String? token,
+      required DateTime dateTime,
+      required bool recurring,
+      required this.medium})
       : super(amount: amount, category: category, dateTime: dateTime, note: note, recurring: recurring, id: id);
 
   @override
@@ -138,7 +132,7 @@ class ExpenseModel extends TransactionModel {
         note: map['description'] == null ? null : Note(map['description']!));
   }
 
-  Expense toDExpense(){
+  Expense toDExpense() {
     return Expense(
       amount: amount,
       dateTime: dateTime,
@@ -148,6 +142,7 @@ class ExpenseModel extends TransactionModel {
       medium: medium,
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       "userId": id.value,
@@ -183,8 +178,4 @@ class ExpenseModel extends TransactionModel {
       "transactionType": "expense"
     };
   }
-
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
 }

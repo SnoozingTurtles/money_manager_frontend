@@ -5,7 +5,6 @@ import 'package:money_manager/application/boundaries/get_transactions/get_transa
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
 import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import '../../domain/models/transaction_model.dart';
-import '../../infrastructure/model/infra_transaction_model.dart';
 
 
 extension Iterables<E> on Iterable<E> {

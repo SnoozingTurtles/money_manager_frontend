@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:money_manager/domain/value_objects/value_failure.dart';
 
 import '../value_objects/user/value_objects.dart';

@@ -50,7 +50,7 @@ class IncomeDTO extends TransactionDTO {
 }
 
 class ExpenseDTO extends TransactionDTO {
-  String medium; //account, cash, card
+  final String medium; //account, cash, card
   ExpenseDTO(
       {required Amount amount,
         required Category category,

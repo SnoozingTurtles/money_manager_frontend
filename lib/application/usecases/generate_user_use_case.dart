@@ -1,5 +1,4 @@
 import 'package:money_manager/domain/repositories/i_user_repository.dart';
-import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
 import '../../domain/models/user_model.dart';
 import '../../domain/value_objects/user/value_objects.dart';

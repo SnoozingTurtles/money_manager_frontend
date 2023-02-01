@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:money_manager/common/constants.dart';
 import 'package:money_manager/common/diox.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
@@ -15,9 +14,18 @@ class SpringBootDataSource implements IDatasource {
   Future<void> addExpense({required ExpenseModel expense, UserId? remoteId}) async {
     Api _xdio = Api();
     Map<String, dynamic> map = expense.toSpringMap();
-    await _xdio.api.post('http://192.168.0.100:8080/api/user/${remoteId!.value}/expenses',
-        data: FormData.fromMap(
-            {'expense': MultipartFile.fromString(jsonEncode(map), contentType: MediaType.parse('application/json'))}));
+    await _xdio.api.post(
+      'http://127.0.0.1:8080/api/user/${remoteId!.value}/expenses',
+      options: Options(extra: map),
+      data: FormData.fromMap(
+        {
+          'expense': MultipartFile.fromString(
+            jsonEncode(map),
+            contentType: MediaType.parse('application/json'),
+          ),
+        },
+      ),
+    );
   }
 
   @override
@@ -25,14 +33,24 @@ class SpringBootDataSource implements IDatasource {
     Api _xdio = Api();
     Map<String, dynamic> map = income.toSpringMap();
 
-    await _xdio.api.post('http://192.168.0.100:8080/api/user/${remoteId!.value}/incomes',
-        data: FormData.fromMap(
-            {'income': MultipartFile.fromString(jsonEncode(map), contentType: MediaType.parse('application/json'))}));
+    await _xdio.api.post(
+      'http://127.0.0.1:8080/api/user/${remoteId!.value}/incomes',
+      options: Options(extra: map),
+      data: FormData.fromMap(
+        {
+          'income': MultipartFile.fromString(
+            jsonEncode(map),
+            contentType: MediaType.parse('application/json'),
+          ),
+        },
+      ),
+    );
   }
 
   @override
   Future<void> addTransaction({required TransactionModel model, UserId? remoteId}) async {
     if (model is ExpenseModel) {
+      debugPrint("ERROR CHECK REMOTEID IS CAUSEING IT $remoteId");
       await addExpense(expense: model, remoteId: remoteId);
     } else if (model is IncomeModel) {
       await addIncome(income: model, remoteId: remoteId);
@@ -53,7 +71,7 @@ class SpringBootDataSource implements IDatasource {
   Future<List<ExpenseModel>> getExpense({required String startDate, required String endDate, UserId? remoteId}) async {
     Api _xdio = Api();
 
-    var mapExpense = await _xdio.api.get('http://192.168.0.100:8080/api/user/${remoteId!.value}/expenses');
+    var mapExpense = await _xdio.api.get('http://127.0.0.1:8080/api/user/${remoteId!.value}/expenses');
 
     debugPrint('SPRING DATA SOURCE:65: getIncome: $mapExpense');
     List map1 = [];
@@ -68,7 +86,7 @@ class SpringBootDataSource implements IDatasource {
   @override
   Future<List<IncomeModel>> getIncome({required String startDate, required String endDate, UserId? remoteId}) async {
     Api _xdio = Api();
-    var mapIncome = await _xdio.api.get('http://192.168.0.100:8080/api/user/${remoteId!.value}/incomes');
+    var mapIncome = await _xdio.api.get('http://127.0.0.1:8080/api/user/${remoteId!.value}/incomes');
     debugPrint('SPRING DATA SOURCE:65: getIncome: $mapIncome');
     List map1 = [];
     try {
@@ -91,13 +109,16 @@ class SpringBootDataSource implements IDatasource {
           "description": transaction['note'],
           "type": transaction['medium'],
         };
-        await _xdio.api.post('http://192.168.0.100:8080/api/user/${remoteId!.value}/expenses',
-            data: FormData.fromMap({
-              'expense': MultipartFile.fromString(
-                jsonEncode(map),
-                contentType: MediaType.parse('application/json'),
-              )
-            }));
+        await _xdio.api.post('http://127.0.0.1:8080/api/user/${remoteId!.value}/expenses',
+            data: FormData.fromMap(
+              {
+                'expense': MultipartFile.fromString(
+                  jsonEncode(map),
+                  contentType: MediaType.parse('application/json'),
+                )
+              },
+            ),
+            options: Options(extra: map));
       } else {
         map = {
           "amount": transaction['amount'],
@@ -105,13 +126,17 @@ class SpringBootDataSource implements IDatasource {
           "dateAdded": transaction['dateTime'],
           "description": transaction['note'],
         };
-        await _xdio.api.post('http://192.168.0.100:8080/api/user/${remoteId!.value}/incomes',
-            data: FormData.fromMap({
+        await _xdio.api.post(
+          'http://127.0.0.1:8080/api/user/${remoteId!.value}/incomes',
+          data: FormData.fromMap(
+            {
               'income': MultipartFile.fromString(
                 jsonEncode(map),
                 contentType: MediaType.parse('application/json'),
               )
-            }));
+            },
+          ),
+        );
       }
     }
   }

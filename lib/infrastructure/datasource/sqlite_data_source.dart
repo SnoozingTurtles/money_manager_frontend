@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/i_user_data_source.dart';
 import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';

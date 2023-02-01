@@ -1,6 +1,5 @@
 import '../../domain/models/user_model.dart';
 import '../../domain/repositories/i_user_repository.dart';
-import '../../domain/value_objects/transaction/value_objects.dart';
 import '../../domain/value_objects/user/value_objects.dart';
 
 class GetUserUseCase{
@@ -9,7 +8,7 @@ class GetUserUseCase{
   GetUserUseCase(this.userRepository);
 
   Future<User> execute() async{
-    var user = await userRepository.get(UserId(1));
+    User user = await userRepository.get(UserId(1));
     return user;
   }
 }

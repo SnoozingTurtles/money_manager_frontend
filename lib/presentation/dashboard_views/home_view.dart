@@ -119,20 +119,20 @@ class _HomeViewState extends State<HomeView> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(
-                        "Income: ${userState.user.income}",
+                        "Income: ${userState.income}",
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      Text("Expense: ${userState.user.expense}", style: Theme.of(context).textTheme.bodyLarge)
+                      Text("Expense: ${userState.expense}", style: Theme.of(context).textTheme.bodyLarge)
                     ],
                   ),
                   Center(
-                      child: Text("Balance: ${userState.user.balance}", style: Theme.of(context).textTheme.bodyLarge)),
+                      child: Text("Balance: ${userState.balance}", style: Theme.of(context).textTheme.bodyLarge)),
                 ],
               ),
             ),
           );
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
