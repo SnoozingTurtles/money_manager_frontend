@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/i_user_data_source.dart';
-import 'package:money_manager/infrastructure/model/infra_user_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 import '../../domain/models/transaction_model.dart';
+import '../../domain/models/user_model.dart';
 import '../../domain/value_objects/user/value_objects.dart';
 
 class SqliteDataSource implements IDatasource, ILocalUserDataSource {
@@ -33,7 +33,7 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   Future<void> addExpense({required Expense expense, UserId? remoteId}) async {
     await _db.insert('expense', expense.toMap());
     double expenseAmount = expense.amount.value.fold((l) => 0, (r) => double.parse(r));
-    UserModel user = await getUser(expense.localId);
+    User user = await getUser(expense.localId);
     await _db.update('user', {"balance": (user.balance - expenseAmount), 'expense': (user.expense + expenseAmount)},
         where: "userId = ?", whereArgs: [expense.localId.value]);
   }
@@ -42,7 +42,7 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   Future<void> addIncome({required Income income, UserId? remoteId}) async {
     await _db.insert('income', income.toMap());
     double incomeAmount = income.amount.value.fold((l) => 0, (r) => double.parse(r));
-    UserModel user = await getUser(income.localId);
+    User user = await getUser(income.localId);
     await _db.update('user', {"balance": (user.balance + incomeAmount), 'income': (user.income + incomeAmount)},
         where: "userId = ?", whereArgs: [income.localId.value]);
   }
@@ -99,9 +99,9 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   }
 
   @override
-  Future<UserModel> getUser(UserId id) async {
+  Future<User> getUser(UserId id) async {
     final value = await _db.query('user', where: "userId = ?", whereArgs: [id.value]);
-    return UserModel(
+    return User(
       localId: UserId(value[0]['userId'] as int),
       remoteId: value[0]['remoteId'] != null ? UserId(value[0]['remoteId'] as int) : null,
       balance: double.parse("${value[0]['balance']}"),

@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:money_manager/common/diox.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/infrastructure/datasource/i_data_source.dart';
-import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../domain/value_objects/user/value_objects.dart';
 

@@ -5,7 +5,6 @@ import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/infrastructure/datasource/spring_data_source.dart';
 import 'package:money_manager/infrastructure/datasource/sqlite_data_source.dart';
-import 'package:money_manager/infrastructure/model/infra_transaction_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 import '../../domain/value_objects/user/value_objects.dart';
