@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:money_manager/application/boundaries/add_transaction/add_transaction_input.dart';
 import 'package:money_manager/application/usecases/add_transaction_usecase.dart';
-import 'package:money_manager/domain/factory/IEntityFactory.dart';
+import 'package:money_manager/domain/factory/i_entity_factory.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
-import 'package:money_manager/domain/repositories/ITransactionRepository.dart';
+import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:mockito/mockito.dart';
 
@@ -36,6 +36,7 @@ void main() {
     var dateTime = DateTime.now();
 
     var input = AddExpenseInput(
+      id:UserId(1),
       amount: amount,
       category: category,
       note: note,
@@ -69,7 +70,7 @@ void main() {
       //assert
       expect(result.isRight(), true);
       // expect(result.getOrElse(null).tId, isNotNull);
-      verify(mockTransactionRepository.add(any)).called(1);
+      verify(mockTransactionRepository.add(any,any)).called(1);
     });
   });
 }

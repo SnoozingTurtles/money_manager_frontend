@@ -14,7 +14,7 @@ part of 'transaction_bloc.dart';
 // }
 
 class TransactionState extends Equatable {
-  final UserId uid;
+  final UserId localId;
   final Amount amount;
   final Category category;
   final Note? note;
@@ -27,7 +27,7 @@ class TransactionState extends Equatable {
 
   const TransactionState(
       {required this.amount,
-      required this.uid,
+      required this.localId,
       required this.income,
       required this.category,
       this.note,
@@ -37,13 +37,13 @@ class TransactionState extends Equatable {
       required this.error,
       required this.commiting});
 
-  factory TransactionState.initial(UserId id) {
+  factory TransactionState.initial(UserId localId) {
     return TransactionState(
         amount: Amount(""),
         category: Category(""),
         income: false,
         dateTime: DateTime.now(),
-        uid: id,
+        localId: localId,
         medium: "Cash",
         recurring: false,
         error: "",
@@ -66,7 +66,7 @@ class TransactionState extends Equatable {
       bool? commiting}) {
     return TransactionState(
       income: income ?? this.income,
-      uid: uid,
+      localId: localId,
       amount: amount ?? this.amount,
       category: category ?? this.category,
       note: note ?? this.note,

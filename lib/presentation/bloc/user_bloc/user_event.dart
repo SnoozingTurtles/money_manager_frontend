@@ -6,25 +6,24 @@ abstract class UserEvent extends Equatable {
 
 class InitUser extends UserEvent{
   @override
-  // TODO: implement props
   List<Object?> get props =>[];
-
-}
-class LoadUser extends UserEvent{
-  @override
-  // TODO: implement props
-  List<Object?> get props =>[];
-
 }
 
-class ReloadUser extends UserEvent{
-  final double balance;
-  final double income;
-  final double expense;
-  const ReloadUser({required this.balance,required this.income,required this.expense});
+class ReloadUserBalance extends UserEvent{
+  final double? balance;
+  final double? income;
+  final double? expense;
+  const ReloadUserBalance({required this.balance,required this.income,required this.expense});
   @override
   // TODO: implement props
   List<Object?> get props =>[balance,income,expense];
-
 }
+class LogUserIn extends UserEvent{
+  final UserId remoteId;
+  const LogUserIn({required this.remoteId});
+  @override
+  // TODO: implement props
+  List<Object?> get props =>[remoteId];
+}
+
 

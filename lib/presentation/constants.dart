@@ -1,2 +1,2 @@
-double? sw;
-double? sh;
+double? width;
+double? height;

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 class DatabaseFactory {
   Future<Database> createDatabase() async {
@@ -24,7 +23,9 @@ class DatabaseFactory {
     name TEXT,
     balance NUMERIC,
     expense NUMERIC,
-    income NUMERIC
+    income NUMERIC,
+    loggedIn TEXT,
+    remoteId INTEGER
     );""");
   }
   _createExpenseTable(Database db) async {
@@ -63,7 +64,7 @@ class DatabaseFactory {
 
   _createBufferTable(Database db)async{
     await db.execute("""CREATE TABLE buffer(
-    amount TEXT PRIMARY KEY,
+    amount TEXT ,
     category TEXT,
     note TEXT,
     dateTime TEXT,

@@ -9,7 +9,7 @@ class ValueFailure<T>{
 }
 
 class Failure{
-  String message;
+  String? message;
 
   Failure(this.message);
 }

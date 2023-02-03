@@ -43,14 +43,3 @@ class Category extends Equatable {
   List<Object?> get props => [value];
 }
 
-class UserId extends Equatable {
-  final int value;
-
-  factory UserId(int value) {
-    return UserId._(value);
-  }
-  const UserId._(this.value);
-
-  @override
-  List<Object> get props => [value];
-}

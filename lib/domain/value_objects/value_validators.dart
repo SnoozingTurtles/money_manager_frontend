@@ -9,6 +9,20 @@ Either<Failure, String> validateFieldNotEmpty(String input) {
     return left(Failure("Can't be empty"));
   }
 }
+Either<Failure, String> validateEmail(String input) {
+  if (input.isNotEmpty && input.contains("@")) {
+    return right(input);
+  } else {
+    return left(Failure("Invalid Email"));
+  }
+}
+Either<Failure, String> validatePassword(String input) {
+  if (input.isNotEmpty && input.length>=5) {
+    return right(input);
+  } else {
+    return left(Failure("Try another password"));
+  }
+}
 
 Either<Failure, String> validateAmount(String amount) {
   String regex = "^\\d+\$";

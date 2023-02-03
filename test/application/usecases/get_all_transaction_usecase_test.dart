@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:money_manager/application/usecases/get_all_transaction_usecase.dart';
+import 'package:money_manager/application/usecases/get_transaction_usecase.dart';
 
 import 'add_transaction_usecase_test.mocks.dart';
 

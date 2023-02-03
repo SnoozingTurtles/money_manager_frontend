@@ -1,8 +1,10 @@
-import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
-import 'package:money_manager/infrastructure/model/model.dart';
+import 'package:money_manager/domain/models/user_model.dart';
 
-abstract class IUserDataSource{
+import '../../domain/value_objects/user/value_objects.dart';
+
+abstract class ILocalUserDataSource{
   Future<int> generateUser();
-  Future<int> addUser(UserModel user);
-  Future<UserModel> getUser(UserId id);
+  Future<void> updateUserId({required UserId remoteId});
+  Future<User> getUser(UserId id);
+  Future<void> cleanDB();
 }
