@@ -6,6 +6,7 @@ import 'package:money_manager/presentation/auth_views/auth_view.dart';
 import 'package:money_manager/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:money_manager/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:money_manager/presentation/dashboard.dart';
+import 'package:money_manager/presentation/landing_views/landing_page.dart';
 
 import 'package:money_manager/presentation/splash_view/splash.dart';
 import 'package:money_manager/presentation/theme.dart';
@@ -45,9 +46,21 @@ void main() async {
                 DashBoard.route: (context) => const DashBoard(),
                 AuthScreen.route: (context) => const AuthScreen(),
                 TransactionView.route: (context) => const TransactionView(),
+                LandingPage.route: (context) => const LandingPage(),
               },
               theme: ThemeData(
-                textTheme: mTextTheme,
+                primaryColor: Color(0xFF486C7C),
+                textTheme: const TextTheme(
+                  displayLarge: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Poppins',
+                    color: Color(0XFF04021D),
+                  ),
+                  titleLarge: TextStyle(fontSize: 30.0, fontFamily: 'Poppins'),
+                  bodyMedium: TextStyle(fontSize: 16.0, fontFamily: 'Poppins'),
+                  bodySmall: TextStyle(fontSize: 14.0, fontFamily: 'Poppins'),
+                ),
               ),
             ),
           ),

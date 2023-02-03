@@ -20,7 +20,7 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
-  final List<Widget> _views = [const HomeView(), const StatsView()];
+  final List<Widget> _views = [ HomeView(), const StatsView()];
   int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
