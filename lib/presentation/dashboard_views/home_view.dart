@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
-import 'package:money_manager/application/usecases/get_transaction_usecase.dart';
-import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
-import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 import 'package:grouped_list/grouped_list.dart';
 
@@ -32,7 +29,7 @@ var month = ["JAN", "FEB", "MAR", "APR", "MAY", "JUNE", "JULY", "AUG", "SEP", "O
 class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
-    BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
+    // BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
     super.initState();
   }
 
@@ -43,117 +40,41 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            children: [
-              // if (state.syncLoading) const LinearProgressIndicator(),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  left: 24.0,
-                ),
-                child: Container(
-                  width: double.infinity,
-                  child: Text(
-                    '${weekday[DateTime.now().weekday - 1]} ${DateTime.now().day} ${month[DateTime.now().month - 1]}',
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 8.0,
+              left: 24.0,
+            ),
+            child: Container(
+              width: double.infinity,
+              child: Text(
+                "Stats for this month",
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  left: 24.0,
-                  right: 24.0,
-                ),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text("Hello, User", style: Theme.of(context).textTheme.titleLarge),
-                  IconButton(onPressed: () {}, icon: Image.asset('assets/common/profile.png')),
-                ]),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  left: 24.0,
-                  right: 24.0,
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ChoiceChip(
-                          label: Text('This Month'),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          onSelected: (val) {},
-                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                          selectedColor: Color(0xFF486C7C),
-                          selected: true),
-                      ChoiceChip(
-                          label: Text('Last Month'),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          onSelected: (val) {},
-                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                          selected: false),
-                      ChoiceChip(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          label: Text('Last 3 Months'),
-                          onSelected: (val) {},
-                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                          selected: false),
-                      ChoiceChip(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          label: Text('Last 6 Months'),
-                          onSelected: (val) {},
-                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                          selected: false),
-                      ChoiceChip(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          label: Text('All time'),
-                          onSelected: (val) {},
-                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                          selected: false),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  left: 24.0,
-                ),
-                child: Container(
-                  width: double.infinity,
-                  child: Text(
-                    "Stats for this month",
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-              ),
-              _buildBalanceCard(),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  left: 24.0,
-                ),
-                child: Container(
-                  width: double.infinity,
-                  child: Text(
-                    "Recent Transactions",
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-              ),
-              _buildTransactionList(),
-            ],
+            ),
           ),
-        ),
+          _buildBalanceCard(),
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 8.0,
+              left: 24.0,
+            ),
+            child: Container(
+              width: double.infinity,
+              child: Text(
+                "Recent Transactions",
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+          ),
+          _buildTransactionList(),
+        ],
       ),
     );
   }
@@ -254,7 +175,7 @@ class _HomeViewState extends State<HomeView> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: transaction[dIndex].length,
+                itemCount: transaction[dIndex].length < 3 ? transaction[dIndex].length : 3,
                 itemBuilder: (BuildContext context, int index) {
                   return XListTile(
                     amount: transaction[dIndex][index].amount.value.fold((l) => "Error", (r) => r),
@@ -274,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
   BlocConsumer<UserBloc, UserState> _buildBalanceCard() {
     return BlocConsumer<UserBloc, UserState>(
       listener: (context, state) {
-        BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
+        // BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
       },
       builder: (context, userState) {
         if (userState is UserLoaded) {

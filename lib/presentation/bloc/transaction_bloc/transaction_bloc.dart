@@ -83,7 +83,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       emit(state.copyWith(dateTime: event.date));
     });
     on<FlipIncome>((event, emit) {
-      emit(state.copyWith(income: true));
+      emit(state.copyWith(income: !state.income));
     });
     on<FlipExpense>((event, emit) {
       emit(state.copyWith(income: false));

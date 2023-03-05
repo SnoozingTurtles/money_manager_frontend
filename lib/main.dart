@@ -8,9 +8,8 @@ import 'package:money_manager/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:money_manager/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:money_manager/presentation/dashboard.dart';
 import 'package:money_manager/presentation/landing_views/landing_page.dart';
-
 import 'package:money_manager/presentation/splash_view/splash.dart';
-import 'package:money_manager/presentation/theme.dart';
+
 import 'package:money_manager/presentation/transaction_views/transaction_view.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
