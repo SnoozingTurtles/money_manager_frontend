@@ -10,7 +10,7 @@ import 'package:money_manager/presentation/dashboard.dart';
 import 'package:money_manager/presentation/landing_views/landing_page.dart';
 import 'package:money_manager/presentation/splash_view/splash.dart';
 
-import 'package:money_manager/presentation/transaction_views/transaction_view.dart';
+import 'package:money_manager/presentation/transaction_views/transaction_form_view.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 import 'infrastructure/factory/db_factory.dart';
@@ -46,7 +46,7 @@ void main() async {
                 DashBoard.route: (context) => const DashBoard(),
                 SignUpView.route: (context) =>  SignUpView(),
                 LoginView.route:(context) => LoginView(),
-                TransactionView.route: (context) => const TransactionView(),
+                TransactionFormView.route: (context) => const TransactionFormView(),
                 LandingPage.route: (context) => const LandingPage(),
               },
               theme: ThemeData(

@@ -35,14 +35,14 @@ Set<String> category = {
   "Salary",
 };
 
-class TransactionView extends StatefulWidget {
+class TransactionFormView extends StatefulWidget {
   static const String route = "/TransactionScreen";
-  const TransactionView({Key? key}) : super(key: key);
+  const TransactionFormView({Key? key}) : super(key: key);
 
   static final formKey = GlobalKey<FormState>();
 
   @override
-  State<TransactionView> createState() => _TransactionViewState();
+  State<TransactionFormView> createState() => _TransactionFormViewState();
 
   Widget _buildCategoryPicker(TransactionState state, BuildContext context) {
     return ListTile(
@@ -196,7 +196,7 @@ class TransactionView extends StatefulWidget {
   }
 }
 
-class _TransactionViewState extends State<TransactionView> {
+class _TransactionFormViewState extends State<TransactionFormView> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -218,9 +218,9 @@ class _TransactionViewState extends State<TransactionView> {
         child: BlocBuilder<TransactionBloc, TransactionState>(
           builder: (context, state) {
             return Scaffold(
-              backgroundColor: state.income ? Colors.green : Colors.red,
+              backgroundColor: state.income ? Colors.green : Color.fromRGBO(253, 60, 74, 0.61),
               body: Form(
-                key: TransactionView.formKey,
+                key: TransactionFormView.formKey,
                 child: Column(children: [
                   Padding(
                     padding: const EdgeInsets.only(

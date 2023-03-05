@@ -7,9 +7,10 @@ import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 import 'package:money_manager/presentation/constants.dart';
 import 'package:money_manager/presentation/dashboard_views/home_view.dart';
 import 'package:money_manager/presentation/dashboard_views/stats_view.dart';
-import 'package:money_manager/presentation/transaction_views/transaction_view.dart';
+import 'package:money_manager/presentation/transaction_views/transaction_form_view.dart';
 
 import 'bloc/user_bloc/user_bloc.dart';
+import 'dashboard_views/transaction_view.dart';
 import 'landing_views/landing_page.dart';
 
 class DashBoard extends StatefulWidget {
@@ -21,7 +22,7 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
-  final List<Widget> _views = [HomeView(), const StatsView(), HomeView(), HomeView()];
+  final List<Widget> _views = [HomeView(), const TransactionView(), HomeView(), HomeView()];
   int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -153,11 +154,15 @@ class _DashBoardState extends State<DashBoard> {
                                   onSelected: (val) {
                                     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
                                   },
+                                  labelStyle:
+                                  TextStyle(color: state.filter == "This Month" ? Colors.white : Colors.black),
                                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                   selectedColor: Color(0xFF486C7C),
                                   selected: state.filter == 'This Month'),
                               ChoiceChip(
                                   label: Text('Last Month'),
+                                  labelStyle:
+                                  TextStyle(color: state.filter == "Last Month" ? Colors.white : Colors.black),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                   onSelected: (val) {
                                     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsLastMonthEvent());
@@ -172,10 +177,13 @@ class _DashBoardState extends State<DashBoard> {
                                     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsLast3MonthEvent());
                                   },
                                   selectedColor: Color(0xFF486C7C),
+                                  labelStyle:
+                                      TextStyle(color: state.filter == "Last 3 Months" ? Colors.white : Colors.black),
                                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                   selected: state.filter == "Last 3 Months"),
                               ChoiceChip(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),labelStyle:
+                              TextStyle(color: state.filter == "Last 6 Months" ? Colors.white : Colors.black),
                                   label: Text('Last 6 Months'),
                                   onSelected: (val) {
                                     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsLast6MonthEvent());
@@ -186,6 +194,8 @@ class _DashBoardState extends State<DashBoard> {
                               ChoiceChip(
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                   label: Text('All time'),
+                                  labelStyle:
+                                  TextStyle(color: state.filter == "All Time" ? Colors.white : Colors.black),
                                   onSelected: (val) {
                                     BlocProvider.of<HomeBloc>(context).add(const LoadTransactionEvent());
                                   },
@@ -235,8 +245,9 @@ class _DashBoardState extends State<DashBoard> {
           floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.add),
+            backgroundColor: Color(0xFF486C7C),
             onPressed: () {
-              Navigator.pushNamed(context, TransactionView.route);
+              Navigator.pushNamed(context, TransactionFormView.route);
             },
           ),
         ),
