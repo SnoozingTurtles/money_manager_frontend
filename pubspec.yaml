@@ -83,6 +83,7 @@ flutter:
     - assets/auth_page/email.png
     - assets/auth_page/pass.png
     - assets/auth_page/name.png
+    - assets/common/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
