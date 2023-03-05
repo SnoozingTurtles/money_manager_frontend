@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:money_manager/domain/value_objects/value_failure.dart';
 
 //calculator validation logic here if made.
@@ -9,6 +10,7 @@ Either<Failure, String> validateFieldNotEmpty(String input) {
     return left(Failure("Can't be empty"));
   }
 }
+
 Either<Failure, String> validateEmail(String input) {
   if (input.isNotEmpty && input.contains("@")) {
     return right(input);
@@ -16,11 +18,20 @@ Either<Failure, String> validateEmail(String input) {
     return left(Failure("Invalid Email"));
   }
 }
+
 Either<Failure, String> validatePassword(String input) {
-  if (input.isNotEmpty && input.length>=5) {
+  if (input.isNotEmpty && input.length >= 5) {
     return right(input);
   } else {
     return left(Failure("Try another password"));
+  }
+}
+
+Either<Failure, String> confirmPassword(String pass, String val) {
+  if (val == pass) {
+    return right(pass);
+  } else {
+    return left(Failure("Passwords do not match"));
   }
 }
 

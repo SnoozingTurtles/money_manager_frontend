@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/common/secure_storage.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
-import 'package:money_manager/presentation/auth_views/auth_view.dart';
+import 'package:money_manager/presentation/auth_views/login_view.dart';
 import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
 import 'package:money_manager/presentation/constants.dart';
 import 'package:money_manager/presentation/dashboard_views/home_view.dart';
@@ -10,6 +10,7 @@ import 'package:money_manager/presentation/dashboard_views/stats_view.dart';
 import 'package:money_manager/presentation/transaction_views/transaction_view.dart';
 
 import 'bloc/user_bloc/user_bloc.dart';
+import 'landing_views/landing_page.dart';
 
 class DashBoard extends StatefulWidget {
   static const String route = '/DashBoard';
@@ -45,14 +46,14 @@ class _DashBoardState extends State<DashBoard> {
                   return IconButton(
                       icon: const Icon(Icons.login),
                       onPressed: () {
-                        Navigator.of(context).pushReplacementNamed(AuthScreen.route);
+                        Navigator.of(context).pushReplacementNamed(LandingPage.route);
                       });
                 } else {
                   return IconButton(
                       icon: Icon(Icons.logout_rounded),
                       onPressed: ()async {
                         await SecureStorage().deleteToken();
-                        Navigator.of(context).pushReplacementNamed(AuthScreen.route);
+                        Navigator.of(context).pushReplacementNamed(LandingPage.route);
                       });
                 }
               },

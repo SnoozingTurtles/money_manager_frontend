@@ -15,8 +15,20 @@ class UserId extends Equatable {
   List<Object> get props => [value];
 }
 
+class Name extends Equatable {
+  final Either<Failure, String> name;
+
+  factory Name(String value) {
+    return Name._(validateFieldNotEmpty(value));
+  }
+  const Name._(this.name);
+
+  @override
+  List<Object> get props => [name];
+}
+
 class Email extends Equatable {
-  final Either<Failure,String> email;
+  final Either<Failure, String> email;
 
   factory Email(String value) {
     return Email._(validateEmail(value));
@@ -26,11 +38,15 @@ class Email extends Equatable {
   @override
   List<Object> get props => [email];
 }
+
 class Password extends Equatable {
-  final Either<Failure,String> password;
+  final Either<Failure, String> password;
 
   factory Password(String value) {
     return Password._(validatePassword(value));
+  }
+  factory Password.signUp(String pass, String confirm) {
+    return Password._(confirmPassword(pass, confirm));
   }
   const Password._(this.password);
 

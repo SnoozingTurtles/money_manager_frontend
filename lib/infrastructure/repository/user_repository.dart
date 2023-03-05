@@ -69,12 +69,12 @@ class UserRepository implements IUserRepository, IAuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserId>> signUp(
-      {required Email email, required Password password, required String name}) async {
+  Future<Either<Failure, UserId>> signUp({required Email email, required Password password, required Name name}) async {
     String? fE = email.email.fold((l) => null, (r) => r);
     String? fP = password.password.fold((l) => null, (r) => r);
+    String? fN = name.name.fold((l) => null, (r) => r);
     Dio dio = Dio();
-    var map = {'email': fE, 'password': fP, 'name': name};
+    var map = {'email': fE, 'password': fP, 'name': fN};
     try {
       var response = await dio.post(REGISTER_ENDPOINT, data: map);
       debugPrint("USER REPO: 56: signUp: $response");

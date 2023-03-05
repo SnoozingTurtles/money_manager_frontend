@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 import 'package:money_manager/infrastructure/repository/user_repository.dart';
-import 'package:money_manager/presentation/auth_views/auth_view.dart';
+import 'package:money_manager/presentation/auth_views/login_view.dart';
+import 'package:money_manager/presentation/auth_views/signup_view.dart';
 import 'package:money_manager/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:money_manager/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:money_manager/presentation/dashboard.dart';
@@ -44,7 +45,8 @@ void main() async {
               home: SplashScreen(),
               routes: {
                 DashBoard.route: (context) => const DashBoard(),
-                AuthScreen.route: (context) => const AuthScreen(),
+                SignUpView.route: (context) =>  SignUpView(),
+                LoginView.route:(context) => LoginView(),
                 TransactionView.route: (context) => const TransactionView(),
                 LandingPage.route: (context) => const LandingPage(),
               },

@@ -212,6 +212,7 @@ class _TransactionViewState extends State<TransactionView> {
       title: TextFormField(
         validator: (_) => state.amount.value.fold((l) => l.message, (r) => null),
         onChanged: (value) {
+
           BlocProvider.of<TransactionBloc>(context).add(ChangeAmountEvent(amount: value));
         },
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
