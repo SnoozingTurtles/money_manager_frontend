@@ -71,7 +71,6 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   Future<List<Expense>> getExpense({required String startDate, required String endDate, UserId? remoteId}) async {
     var listOfMapsExpenses =
         await _db.query('expense', where: 'dateTime between ? and ?', whereArgs: [startDate, endDate]);
-    print(listOfMapsExpenses);
     return listOfMapsExpenses.map<Expense>((map) => Expense.fromMap(map)).toList();
   }
 

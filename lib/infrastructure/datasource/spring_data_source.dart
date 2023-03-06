@@ -50,7 +50,7 @@ class SpringBootDataSource implements IDatasource {
   @override
   Future<void> addTransaction({required Transaction model, UserId? remoteId}) async {
     if (model is Expense) {
-      debugPrint("ERROR CHECK REMOTEID IS CAUSEING IT $remoteId");
+      debugPrint("ERROR CHECK REMOTE ID IS CAUSING IT $remoteId");
       await addExpense(expense: model, remoteId: remoteId);
     } else if (model is Income) {
       await addIncome(income: model, remoteId: remoteId);

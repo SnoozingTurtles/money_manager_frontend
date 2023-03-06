@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/infrastructure/factory/entity_factory.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 import 'package:money_manager/presentation/auth_views/widgets/widgets.dart';
-import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
-import 'package:money_manager/presentation/bloc/transaction_bloc/transaction_bloc.dart';
+import 'package:money_manager/presentation/bloc/dashboard_bloc/dashboard_bloc.dart';
+import 'package:money_manager/presentation/bloc/transaction_form_bloc/transaction_form_bloc.dart';
 
 import '../bloc/user_bloc/user_bloc.dart';
 
@@ -24,17 +24,6 @@ List<String> months = [
   "December",
 ];
 
-Set<String> category = {
-  "Clothing",
-  "Education",
-  "Entertainment",
-  "Food",
-  "Fuel",
-  "Grooming",
-  "Health",
-  "Salary",
-};
-
 class TransactionFormView extends StatefulWidget {
   static const String route = "/TransactionScreen";
   const TransactionFormView({Key? key}) : super(key: key);
@@ -44,7 +33,7 @@ class TransactionFormView extends StatefulWidget {
   @override
   State<TransactionFormView> createState() => _TransactionFormViewState();
 
-  Widget _buildCategoryPicker(TransactionState state, BuildContext context) {
+  Widget _buildCategoryPicker(TransactionFormState state, BuildContext context) {
     return ListTile(
       leading: Icon(Icons.category),
       title: InkWell(
@@ -71,7 +60,7 @@ class TransactionFormView extends StatefulWidget {
     );
   }
 
-  ListTile _buildSwitches(TransactionState state, BuildContext context) {
+  ListTile _buildSwitches(TransactionFormState state, BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.motion_photos_on),
       title: Row(
@@ -79,7 +68,7 @@ class TransactionFormView extends StatefulWidget {
           ChoiceChip(
             selected: state.income,
             onSelected: (val) {
-              BlocProvider.of<TransactionBloc>(context).add(FlipIncome());
+              BlocProvider.of<TransactionFormBloc>(context).add(FlipIncome());
             },
             label: const Text("Income"),
           ),
@@ -87,7 +76,7 @@ class TransactionFormView extends StatefulWidget {
             selected: !state.income,
             label: const Text("Expense"),
             onSelected: (val) {
-              BlocProvider.of<TransactionBloc>(context).add(FlipExpense());
+              BlocProvider.of<TransactionFormBloc>(context).add(FlipExpense());
             },
           ),
         ],
@@ -95,13 +84,13 @@ class TransactionFormView extends StatefulWidget {
     );
   }
 
-  ListTile _buildNoteFormField(TransactionState state, BuildContext context) {
+  ListTile _buildNoteFormField(TransactionFormState state, BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.note),
       title: TextFormField(
         validator: (_) => state.note != null ? state.note!.value.fold((l) => l.message, (r) => null) : null,
         onChanged: (value) {
-          BlocProvider.of<TransactionBloc>(context).add(ChangeNoteEvent(note: value));
+          BlocProvider.of<TransactionFormBloc>(context).add(ChangeNoteEvent(note: value));
         },
         decoration: mInputDecoration("Description"),
         maxLines: 3,
@@ -110,7 +99,7 @@ class TransactionFormView extends StatefulWidget {
     );
   }
 
-  Future<ListTile> _buildCalendarFormField(BuildContext context, TransactionState state) async {
+  Future<ListTile> _buildCalendarFormField(BuildContext context, TransactionFormState state) async {
     return ListTile(
         leading: const Icon(Icons.calendar_month),
         title: Align(
@@ -131,7 +120,7 @@ class TransactionFormView extends StatefulWidget {
                     milliseconds: DateTime.now().millisecond));
 
                 debugPrint(date.toIso8601String());
-                BlocProvider.of<TransactionBloc>(context).add(ChangeDateEvent(date: date));
+                BlocProvider.of<TransactionFormBloc>(context).add(ChangeDateEvent(date: date));
               },
               child: TextFormField(
                 decoration: mInputDecoration('Date'),
@@ -141,7 +130,7 @@ class TransactionFormView extends StatefulWidget {
             )));
   }
 
-  Widget _buildExpenseFormField(TransactionState state, BuildContext context) {
+  Widget _buildExpenseFormField(TransactionFormState state, BuildContext context) {
     return Row(
       children: [
         Padding(
@@ -157,9 +146,8 @@ class TransactionFormView extends StatefulWidget {
                 hintStyle: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.white)),
             // validator: (_) => state.amount.value.fold((l) => l.message, (r) => null),
             onChanged: (value) {
-              BlocProvider.of<TransactionBloc>(context).add(ChangeAmountEvent(amount: value));
+              BlocProvider.of<TransactionFormBloc>(context).add(ChangeAmountEvent(amount: value));
             },
-
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),
           ),
@@ -168,25 +156,25 @@ class TransactionFormView extends StatefulWidget {
     );
   }
 
-  Widget _buildSaveButton(TransactionState state, BuildContext context) {
+  Widget _buildSaveButton(TransactionFormState state, BuildContext context) {
     return XButton(
         width: double.infinity,
         height: MediaQuery.of(context).size.height / 13,
         alter: false,
-        onPressed: () async {
+        onPressed: () {
           if (formKey.currentState!.validate() &&
               state.amount.value.fold((l) => false, (r) => true) &&
               state.category.value.fold((l) => false, (r) => true)) {
-            BlocProvider.of<TransactionBloc>(context).add(
+            BlocProvider.of<TransactionFormBloc>(context).add(
               AddTransaction(id: state.localId),
             );
-            BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
-            Navigator.pop(context);
+            // BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsThisMonthEvent());
+            // Navigator.pop(context);
           } else if (state.category.value.fold((l) => true, (r) => false)) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Pick a category"),
             ));
-          }else if(state.amount.value.fold((l)=>true,(r)=>false)){
+          } else if (state.amount.value.fold((l) => true, (r) => false)) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Enter a valid amount"),
             ));
@@ -201,21 +189,23 @@ class _TransactionFormViewState extends State<TransactionFormView> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(
-          create: (context) => HomeBloc(
-              transactionRepository: RepositoryProvider.of<TransactionRepository>(context),
-              userBloc: BlocProvider.of<UserBloc>(context)),
-        ),
-        BlocProvider<TransactionBloc>(
-          create: (context) => TransactionBloc(
+        BlocProvider<TransactionFormBloc>(
+          create: (context) => TransactionFormBloc(
               userBloc: BlocProvider.of<UserBloc>(context),
               iEntityFactory: EntityFactory(),
               localId: (BlocProvider.of<UserBloc>(context).state as UserLoaded).localId,
-              iTransactionRepository: RepositoryProvider.of<TransactionRepository>(context)),
+              iTransactionRepository: RepositoryProvider.of<TransactionRepository>(context))
+            ..add(LoadCategoryEvent()),
         ),
       ],
       child: SafeArea(
-        child: BlocBuilder<TransactionBloc, TransactionState>(
+        child: BlocConsumer<TransactionFormBloc, TransactionFormState>(
+          listener: (context, state) {
+            if (state.saving == false) {
+              BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsThisMonthEvent());
+              Navigator.of(context).pop();
+            }
+          },
           builder: (context, state) {
             return Scaffold(
               backgroundColor: state.income ? Colors.green : Color.fromRGBO(253, 60, 74, 0.61),
@@ -246,7 +236,7 @@ class _TransactionFormViewState extends State<TransactionFormView> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-                          BlocProvider.of<TransactionBloc>(context).add(FlipIncome());
+                          BlocProvider.of<TransactionFormBloc>(context).add(FlipIncome());
                         },
                       )
                     ]),
@@ -286,9 +276,8 @@ class _TransactionFormViewState extends State<TransactionFormView> {
   }
 }
 
-
 class CategoryPicker extends StatefulWidget {
-  final TransactionState state;
+  final TransactionFormState state;
   final BuildContext context;
   const CategoryPicker({Key? key, required this.state, required this.context}) : super(key: key);
 
@@ -303,8 +292,8 @@ class _CategoryPickerState extends State<CategoryPicker> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: BlocProvider.of<TransactionBloc>(widget.context),
-      child: BlocBuilder<TransactionBloc, TransactionState>(
+      value: BlocProvider.of<TransactionFormBloc>(widget.context),
+      child: BlocBuilder<TransactionFormBloc, TransactionFormState>(
         builder: (context, state) {
           return Form(
             key: innerKey,
@@ -312,16 +301,17 @@ class _CategoryPickerState extends State<CategoryPicker> {
             child: AlertDialog(
               title: const Text("Pick a category that best describes your transaction"),
               content: Wrap(spacing: 5.0, children: [
-                ...category.map((categoryText) {
+                ...state.availableCategories.map((category) {
+                  var categoryText = category.value.fold((l) => "", (r) => r);
                   selectedCategory = state.category.value.fold((l) => "", (r) => r);
                   return InputChip(
                     label: Text(categoryText),
                     selected: selectedCategory == categoryText,
                     onSelected: (value) {
                       if (selectedCategory == categoryText) {
-                        BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: ""));
+                        BlocProvider.of<TransactionFormBloc>(context).add(ChangeCategoryEvent(category: ""));
                       } else {
-                        BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: categoryText));
+                        BlocProvider.of<TransactionFormBloc>(context).add(ChangeCategoryEvent(category: categoryText));
                       }
                     },
                   );
@@ -336,7 +326,7 @@ class _CategoryPickerState extends State<CategoryPicker> {
                         },
                         onChanged: (value) {
                           selectedCategory = value;
-                          BlocProvider.of<TransactionBloc>(context).add(ChangeCategoryEvent(category: value));
+                          BlocProvider.of<TransactionFormBloc>(context).add(ChangeCategoryEvent(category: value));
                         },
                         decoration: mInputDecoration("Category"),
                       ),
@@ -354,16 +344,13 @@ class _CategoryPickerState extends State<CategoryPicker> {
                 ElevatedButton(
                     onPressed: () {
                       if (innerKey.currentState!.validate() && state.category.value.fold((l) => false, (r) => true)) {
-                        if (selectedCategory != "") {
-                          category.add(selectedCategory);
-                        }
                         Navigator.pop(context);
                       }
                     },
                     child: const Text("Ok")),
                 ElevatedButton(
                     onPressed: () {
-                      BlocProvider.of<TransactionBloc>(context).add(const ChangeCategoryEvent(category: ""));
+                      BlocProvider.of<TransactionFormBloc>(context).add(const ChangeCategoryEvent(category: ""));
                       Navigator.pop(context);
                     },
                     child: const Text("Cancel")),
@@ -375,7 +362,6 @@ class _CategoryPickerState extends State<CategoryPicker> {
     );
   }
 }
-
 
 InputDecoration mInputDecoration(String label) {
   return InputDecoration(

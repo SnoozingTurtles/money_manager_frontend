@@ -8,13 +8,6 @@ import 'package:money_manager/domain/repositories/i_transaction_repository.dart'
 import '../../domain/models/transaction_model.dart';
 
 
-extension Iterables<E> on Iterable<E> {
-  SplayTreeMap<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
-    SplayTreeMap<K, List<E>>(),
-        (SplayTreeMap<K, List<E>> map, E element) => map..putIfAbsent(keyFunction(element),
-            () => <E>[]).add(element),
-  );
-}
 
 class GetAllTransactionUseCase implements IGetTransactionUseCase {
   final ITransactionRepository _transactionRepository;
@@ -24,65 +17,69 @@ class GetAllTransactionUseCase implements IGetTransactionUseCase {
 
   @override
   Future<GetAllTransactionOutput> executeAllTime() async {
-
-    String startDate = DateTime.now().subtract(const Duration(days:360)).toIso8601String();
+    String startDate = DateTime.now().subtract(const Duration(days: 360)).toIso8601String();
     String endDate = DateTime.now().add(const Duration(days: 360)).toIso8601String();
 
     return await _generateOutput(startDate, endDate);
   }
+
   @override
-  Future<GetAllTransactionOutput> executeCustom(String startDate, String endDate)async {
+  Future<GetAllTransactionOutput> executeCustom(String startDate, String endDate) async {
     return await _generateOutput(startDate, endDate);
   }
 
   @override
-  Future<GetAllTransactionOutput> executeLast3Months() async{
-    String startDate = DateTime.now().subtract(const Duration(days:90)).toIso8601String();
+  Future<GetAllTransactionOutput> executeLast3Months() async {
+    String startDate = DateTime.now().subtract(const Duration(days: 90)).toIso8601String();
     String endDate = DateTime.now().toIso8601String();
     return await _generateOutput(startDate, endDate);
   }
 
   @override
-  Future<GetAllTransactionOutput> executeLast6Months() async{
-    String startDate = DateTime.now().subtract(const Duration(days:180)).toIso8601String();
+  Future<GetAllTransactionOutput> executeLast6Months() async {
+    String startDate = DateTime.now().subtract(const Duration(days: 180)).toIso8601String();
     String endDate = DateTime.now().toIso8601String();
     return await _generateOutput(startDate, endDate);
   }
 
   @override
-  Future<GetAllTransactionOutput> executeLastMonth() async{
-    String startDate = DateTime.now().subtract(const Duration(days:60)).toIso8601String();
-    String endDate = DateTime.now().subtract(const Duration(days:30)).toIso8601String();
+  Future<GetAllTransactionOutput> executeLastMonth() async {
+    String startDate = DateTime.now().subtract(const Duration(days: 60)).toIso8601String();
+    String endDate = DateTime.now().subtract(const Duration(days: 30)).toIso8601String();
 
     return await _generateOutput(startDate, endDate);
   }
 
   @override
-  Future<GetAllTransactionOutput> executeThisMonth() async{
-    String startDate = DateTime.now().subtract(const Duration(days:30)).toIso8601String();
+  Future<GetAllTransactionOutput> executeThisMonth() async {
+    String startDate = DateTime.now().subtract(const Duration(days: 30)).toIso8601String();
     String endDate = DateTime.now().add(const Duration(days: 360)).toIso8601String();
 
     return await _generateOutput(startDate, endDate);
-
   }
+
   ///TEST FUNCTION
-  Future<List<Transaction>> executeThisMonthTest() async{
-    String startDate = DateTime.now().subtract(const Duration(days:30)).toIso8601String();
+  Future<List<Transaction>> executeThisMonthTest() async {
+    String startDate = DateTime.now().subtract(const Duration(days: 30)).toIso8601String();
     String endDate = DateTime.now().add(const Duration(days: 360)).toIso8601String();
-    var transactions =await _transactionRepository.getLocal(startDate:startDate,endDate: endDate);
+    var transactions = await _transactionRepository.getLocal(startDate: startDate, endDate: endDate);
 
     return transactions;
-
   }
 
+  Future<GetAllTransactionOutput> _generateOutput(String startDate, String endDate) async {
+    var transactions = await _transactionRepository.getLocal(startDate: startDate, endDate: endDate);
+    transactions.sort((t1, t2) {
+      return t2.dateTime.compareTo(t1.dateTime);
+    });
+    var output = transactions
+        .map((transaction) =>
+            transaction is Expense ? ExpenseDTO.fromEntity(transaction) : IncomeDTO.fromEntity(transaction))
+        .toList();
 
-  Future<GetAllTransactionOutput> _generateOutput(String startDate, String endDate) async{
-    var transactions =await _transactionRepository.getLocal(startDate:startDate,endDate: endDate);
-    var test = transactions.groupBy((p0) => p0.dateTime.toString().substring(0,10));
-    var output =  test.map((key, value) => MapEntry(key, test[key]!.map((e) => e is Expense? ExpenseDTO.fromEntity(e):IncomeDTO.fromEntity(e),).toList()));
+    // var test = transactions.groupBy((p0) => p0.dateTime.toString().substring(0,10));
+    // var output =  test.map((key, value) => MapEntry(key, test[key]!.map((e) => e is Expense? ExpenseDTO.fromEntity(e):IncomeDTO.fromEntity(e),).toList()));
 
-    return GetAllTransactionOutput(transactions: SplayTreeMap.from(output));
+    return GetAllTransactionOutput(transactions: output);
   }
-
 }
-

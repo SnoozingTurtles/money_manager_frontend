@@ -1,7 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
-import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
+import 'package:money_manager/presentation/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:grouped_list/grouped_list.dart';
 
 import '../../domain/models/transaction_model.dart';
@@ -29,7 +31,6 @@ var month = ["JAN", "FEB", "MAR", "APR", "MAY", "JUNE", "JULY", "AUG", "SEP", "O
 class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
-    // BlocProvider.of<HomeBloc>(context).add(const LoadTransactionsThisMonthEvent());
     super.initState();
   }
 
@@ -41,7 +42,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery.of(context).size.height * 0.7,
       child: Column(
         children: [
           Padding(
@@ -79,17 +80,26 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  BlocBuilder<HomeBloc, HomeState> _buildTransactionList() {
-    return BlocBuilder<HomeBloc, HomeState>(
+  Widget _buildTransactionList() {
+    return BlocBuilder<DashBoardBloc, DashBoardState>(
       builder: (context, state) {
-        if (state is HomeLoaded) {
+        if (state is DashBoardLoaded) {
           if (state.transactions.isEmpty) {
             return const Center(child: Text("No recent transactions found"));
           } else {
-            List<String> dateTime = state.transactions.keys.toList().reversed.toList();
-            List<List<TransactionDTO>> transaction = state.transactions.values.toList().reversed.toList();
+            var transactions = state.transactions;
             return Expanded(
-              child: listView(dateTime, transaction),
+              child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    var transaction = transactions[index];
+                    return XListTile(
+                      amount: transaction.amount.value.fold((l) => 'error', (r) => r),
+                      title: transaction.category.value.fold((l) => 'error', (r) => r),
+                      transactionType: transaction,
+                      note: transaction.note != null ? transaction.note!.value.fold((l) => "error", (r) => r) : null,
+                    );
+                  },
+                  itemCount: min(state.transactions.length, 7)),
             );
           }
         } else {
@@ -97,99 +107,6 @@ class _HomeViewState extends State<HomeView> {
         }
       },
     );
-  }
-
-  FutureBuilder<List<Transaction>> futureBuilderListUsingPackage() {
-    return FutureBuilder(
-        future: widget.tListTest,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            var output = snapshot.data!.map((e) => e is Expense ? ExpenseDTO.fromEntity(e) : IncomeDTO.fromEntity(e));
-            debugPrint("INIT STATE ${output}");
-            return GroupedListView(
-              elements: snapshot.data!,
-              order: GroupedListOrder.DESC,
-              groupBy: (element) {
-                DateTime value = DateTime(element.dateTime.year, element.dateTime.month, element.dateTime.day);
-                return value;
-              },
-              groupComparator: (value1, value2) {
-                DateTime onlyDate1 = DateTime(value1.year, value1.month, value1.day);
-                DateTime onlyDate2 = DateTime(value2.year, value2.month, value2.day);
-                return onlyDate1.compareTo(onlyDate2);
-              },
-              groupSeparatorBuilder: (value) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  value.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              itemBuilder: (context, element) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: SizedBox(
-                    child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        title: Text(element.category.value.fold((l) => "null", (r) => r)),
-                        trailing: SizedBox(
-                          width: width! * 1 / 5,
-                          child: Row(
-                            children: [
-                              Text(
-                                element.amount.value.fold((l) => "Error", (r) => r),
-                              ),
-                              element is IncomeDTO
-                                  ? const Icon(
-                                      Icons.arrow_upward,
-                                      color: Colors.green,
-                                    )
-                                  : const Icon(
-                                      Icons.arrow_downward,
-                                      color: Colors.red,
-                                    )
-                            ],
-                          ),
-                        ),
-                        subtitle: Text(
-                          element.note != null ? element.note!.value.fold((l) => "null", (r) => r) : "null",
-                        )),
-                  ),
-                );
-              },
-            );
-          }
-          return CircularProgressIndicator();
-        });
-  }
-
-  ListView listView(List<String> dateTime, List<List<TransactionDTO>> transaction) {
-    return ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: dateTime.length < 3 ? dateTime.length : 3,
-        itemBuilder: (context, dIndex) {
-          return Column(
-            children: [
-              // RawChip(label: Text(dateTime[dIndex].toString())),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: transaction[dIndex].length < 3 ? transaction[dIndex].length : 3,
-                itemBuilder: (BuildContext context, int index) {
-                  return XListTile(
-                    amount: transaction[dIndex][index].amount.value.fold((l) => "Error", (r) => r),
-                    title: transaction[dIndex][index].category.value.fold((l) => "Error", (r) => r),
-                    note: transaction[dIndex][index].note == null
-                        ? null
-                        : transaction[dIndex][index].note!.value.fold((l) => "null", (r) => r),
-                    transactionType: transaction[dIndex][index],
-                  );
-                },
-              ),
-            ],
-          );
-        });
   }
 
   BlocConsumer<UserBloc, UserState> _buildBalanceCard() {

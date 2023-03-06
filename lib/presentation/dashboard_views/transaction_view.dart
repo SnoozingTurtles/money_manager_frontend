@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/presentation/bloc/home_bloc/home_bloc.dart';
+import 'package:money_manager/presentation/bloc/dashboard_bloc/dashboard_bloc.dart';
 
 import '../../application/boundaries/get_transactions/transaction_dto.dart';
+import '../bloc/dashboard_bloc/transaction_bloc/transaction_bloc.dart';
 import 'home_view.dart';
 
 class TransactionView extends StatelessWidget {
   const TransactionView({Key? key}) : super(key: key);
+
   ListView listView(List<String> dateTime, List<List<TransactionDTO>> transaction) {
     return ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
         itemCount: dateTime.length,
         itemBuilder: (context, dIndex) {
           return Column(
@@ -37,18 +38,27 @@ class TransactionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(
+    return BlocBuilder<DashBoardBloc, DashBoardState>(
       builder: (context, state) {
-        if (state is HomeLoaded) {
+        if (state is DashBoardLoaded) {
           if (state.transactions.isEmpty) {
             return const Center(child: Text("No recent transactions found"));
           } else {
-            List<String> dateTime = state.transactions.keys.toList().reversed.toList();
-            List<List<TransactionDTO>> transaction = state.transactions.values.toList().reversed.toList();
-            return SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: Expanded(
-                child: listView(dateTime, transaction),
+            return BlocProvider(
+              create: (context) => TransactionBloc()..add(TransactionInput(transactionList: state.transactions)),
+              child: BlocBuilder<TransactionBloc, TransactionState>(
+                builder: (context, state) {
+                  if (state is TransactionLoaded) {
+                    List<String> dateTime = state.transactions.keys.toList().reversed.toList();
+                    List<List<TransactionDTO>> transaction = state.transactions.values.toList().reversed.toList();
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: listView(dateTime, transaction),
+                    );
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
               ),
             );
           }

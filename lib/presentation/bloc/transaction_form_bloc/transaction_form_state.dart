@@ -1,19 +1,6 @@
-part of 'transaction_bloc.dart';
+part of 'transaction_form_bloc.dart';
 
-// abstract class TransactionState extends Equatable{
-//   const TransactionState();
-// }
-// class InitialState extends TransactionState{
-//   @override
-//   List<Object> get props =>[];
-// }
-// class LoadingState extends TransactionState{
-//   @override
-//   List<Object?> get props => [];
-//
-// }
-
-class TransactionState extends Equatable {
+class TransactionFormState extends Equatable {
   final UserId localId;
   final Amount amount;
   final Category category;
@@ -22,11 +9,13 @@ class TransactionState extends Equatable {
   final String medium;
   final bool recurring;
   final String error;
-  final bool commiting;
+  final bool saving;
   final bool income;
+  final Set<Category> availableCategories;
 
-  const TransactionState(
+  const TransactionFormState(
       {required this.amount,
+      required this.availableCategories,
       required this.localId,
       required this.income,
       required this.category,
@@ -35,10 +24,10 @@ class TransactionState extends Equatable {
       required this.medium,
       required this.recurring,
       required this.error,
-      required this.commiting});
+      required this.saving});
 
-  factory TransactionState.initial(UserId localId) {
-    return TransactionState(
+  factory TransactionFormState.initial(UserId localId) {
+    return TransactionFormState(
         amount: Amount(""),
         category: Category(""),
         income: false,
@@ -47,14 +36,24 @@ class TransactionState extends Equatable {
         medium: "Cash",
         recurring: false,
         error: "",
-        commiting: false);
+        availableCategories: {
+          Category("Clothing"),
+          Category("Education"),
+          Category("Entertainment"),
+          Category("Food"),
+          Category("Fuel"),
+          Category("Grooming"),
+          Category("Health"),
+          Category("Salary"),
+        },
+        saving: true);
   }
   @override
   List<Object> get props => note == null
-      ? [amount, category, dateTime, medium, recurring,income]
-      : [amount, category, dateTime, medium, recurring, note!,income];
+      ? [amount, category, dateTime, medium, recurring, income, saving]
+      : [amount, category, dateTime, medium, recurring, note!, income, saving];
 
-  TransactionState copyWith(
+  TransactionFormState copyWith(
       {Amount? amount,
       Category? category,
       Note? note,
@@ -62,10 +61,12 @@ class TransactionState extends Equatable {
       String? medium,
       bool? recurring,
       String? error,
+      Set<Category>? availableCategories,
       bool? income,
-      bool? commiting}) {
-    return TransactionState(
+      bool? saving}) {
+    return TransactionFormState(
       income: income ?? this.income,
+      availableCategories: availableCategories ?? this.availableCategories,
       localId: localId,
       amount: amount ?? this.amount,
       category: category ?? this.category,
@@ -74,7 +75,7 @@ class TransactionState extends Equatable {
       recurring: recurring ?? this.recurring,
       medium: medium ?? this.medium,
       error: error ?? this.error,
-      commiting: commiting ?? this.commiting,
+      saving: saving ?? this.saving,
     );
   }
 }

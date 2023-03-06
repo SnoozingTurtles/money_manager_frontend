@@ -2,22 +2,28 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:money_manager/application/boundaries/add_transaction/add_transaction_input.dart';
 import 'package:money_manager/application/usecases/add_transaction_usecase.dart';
+import 'package:money_manager/application/usecases/categories/get_categories_use_case.dart';
+import 'package:money_manager/application/usecases/get_transaction_usecase.dart';
 import 'package:money_manager/common/secure_storage.dart';
 import 'package:money_manager/domain/factory/i_entity_factory.dart';
 import 'package:money_manager/domain/repositories/i_transaction_repository.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../application/boundaries/get_transactions/transaction_dto.dart';
 import '../../../domain/value_objects/user/value_objects.dart';
+import '../dashboard_bloc/dashboard_bloc.dart';
 import '../user_bloc/user_bloc.dart';
 
-part 'transaction_event.dart';
-part 'transaction_state.dart';
+part 'transaction_form_event.dart';
+part 'transaction_form_state.dart';
 
-class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
+class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormState> {
   final AddTransactionUseCase _addTransactionUseCase;
+  final GetCategoriesUseCase getCategoriesUseCase = GetCategoriesUseCase();
+  final GetAllTransactionUseCase getAllTransactionUseCase;
   UserBloc _userBloc;
-  TransactionBloc({
+  TransactionFormBloc({
     required ITransactionRepository iTransactionRepository,
     required IEntityFactory iEntityFactory,
     required UserBloc userBloc,
@@ -25,8 +31,10 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   })  : _userBloc = userBloc,
         _addTransactionUseCase =
             AddTransactionUseCase(transactionRepository: iTransactionRepository, entityFactory: iEntityFactory),
-        super(TransactionState.initial(localId)) {
+        getAllTransactionUseCase = GetAllTransactionUseCase(iTransactionRepository: iTransactionRepository),
+        super(TransactionFormState.initial(localId)) {
     on<AddTransaction>((event, emit) async {
+      emit(state.copyWith(saving: true));
       AddTransactionInput addTransactionInput;
       var balance = (_userBloc.state as UserLoaded).balance;
       var income = (_userBloc.state as UserLoaded).income;
@@ -65,10 +73,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       }
 
       var output = await _addTransactionUseCase.execute(input: addTransactionInput, remoteId: remoteId);
+
       output.fold((l) {
-        state.copyWith(error: l.message);
+        state.copyWith(error: l.message, saving: false);
         throw Exception(l.message);
-      }, (r) => r);
+      }, (r) => emit(state.copyWith(saving: false)));
+
+      // _dashBoardBloc.add(const LoadTransactionsThisMonthEvent());
     });
     on<ChangeAmountEvent>((event, emit) {
       emit(state.copyWith(amount: Amount(event.amount)));
@@ -87,6 +98,11 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     });
     on<FlipExpense>((event, emit) {
       emit(state.copyWith(income: false));
+    });
+    on<LoadCategoryEvent>((event,emit)async{
+      var transactions = await getAllTransactionUseCase.executeAllTime();
+      var categories = getCategoriesUseCase.getCategories(transactions.transactions);
+      emit(state.copyWith(availableCategories: categories));
     });
   }
 }
