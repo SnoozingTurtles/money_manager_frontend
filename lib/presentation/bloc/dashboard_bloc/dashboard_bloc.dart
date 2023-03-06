@@ -85,7 +85,7 @@ class DashBoardBloc extends Bloc<DashBoardEvent, DashBoardState> {
       emit(DashBoardLoaded(
           transactions: transactions,
           syncLoading: false,
-          filter: "${event.startDate.toString().substring(0, 10)} to ${event.endDate.toString().substring(0, 10)}"));
+          filter: "custom"));
     });
   }
 

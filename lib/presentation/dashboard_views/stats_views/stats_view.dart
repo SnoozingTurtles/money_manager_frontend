@@ -39,7 +39,6 @@ class StatsView extends StatelessWidget {
                             for (var value1 in vList) {
                               totalMoney += value1;
                             }
-                            debugPrint(width.toString());
                             return Container(
                               margin: EdgeInsets.all(12),
                               height: height * 0.08,

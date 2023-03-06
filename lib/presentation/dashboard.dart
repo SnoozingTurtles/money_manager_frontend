@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/common/secure_storage.dart';
-import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
-import 'package:money_manager/presentation/auth_views/login_view.dart';
 import 'package:money_manager/presentation/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:money_manager/presentation/constants.dart';
 import 'package:money_manager/presentation/dashboard_views/home_view.dart';
+import 'package:money_manager/presentation/landing_views/landing_page.dart';
 import 'package:money_manager/presentation/transaction_views/transaction_form_view.dart';
 import 'dashboard_views/stats_views/stats_view.dart';
 import 'dashboard_views/transaction_view.dart';
@@ -27,22 +26,6 @@ class _DashBoardState extends State<DashBoard> {
     height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
-        //         PopupMenuItem(
-        //             child: const Text("Custom"),
-        //             onTap: () async {
-        //               var output = await Future.delayed(
-        //                   const Duration(seconds: 0),
-        //                   () async => await showDateRangePicker(
-        //                         context: context,
-        //                         firstDate: DateTime.now().subtract(const Duration(days: 360)),
-        //                         lastDate: DateTime.now().add(const Duration(days: 360)),
-        //                       ));
-        //               if (output != null) {
-        //                 BlocProvider.of<HomeBloc>(context)
-        //                     .add(LoadTransactionsCustomEvent(startDate: output.start, endDate: output.end));
-        //               }
-        //             }),
-        // ),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -68,7 +51,12 @@ class _DashBoardState extends State<DashBoard> {
                 ),
                 child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text("Hello, User", style: Theme.of(context).textTheme.titleLarge),
-                  IconButton(onPressed: () {}, icon: Image.asset('assets/common/profile.png')),
+                  IconButton(
+                      onPressed: () async {
+                        await SecureStorage().deleteToken();
+                        Navigator.of(context).pushReplacementNamed(LandingPage.route);
+                      },
+                      icon: Image.asset('assets/common/profile.png')),
                 ]),
               ),
               Padding(
@@ -139,6 +127,26 @@ class _DashBoardState extends State<DashBoard> {
                                 selectedColor: Color(0xFF486C7C),
                                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                 selected: state.filter == "All Time"),
+                            ChoiceChip(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                label: Text('Custom'),
+                                labelStyle: TextStyle(color: state.filter == "Custom" ? Colors.white : Colors.black),
+                                onSelected: (val) async {
+                                  var output = await Future.delayed(
+                                      const Duration(seconds: 0),
+                                      () async => await showDateRangePicker(
+                                            context: context,
+                                            firstDate: DateTime.now().subtract(const Duration(days: 360)),
+                                            lastDate: DateTime.now().add(const Duration(days: 360)),
+                                          ));
+                                  if (output != null) {
+                                    BlocProvider.of<DashBoardBloc>(context)
+                                        .add(LoadTransactionsCustomEvent(startDate: output.start, endDate: output.end));
+                                  }
+                                },
+                                selectedColor: Color(0xFF486C7C),
+                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                selected: state.filter == "custom"),
                           ],
                         ),
                       );
