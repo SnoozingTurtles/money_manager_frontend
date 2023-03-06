@@ -95,7 +95,7 @@ class TransactionRepository implements ITransactionRepository {
   Future<void> syncLocalToRemote({UserId? remoteId}) async {
     if (await _connectivity.hasConnection) {
       var map = await getBuffer();
-      print("SYNC LOCAL TO REMOTE EMPTY BUFFER IS : $map");
+      debugPrint("SYNC LOCAL TO REMOTE EMPTY BUFFER IS : $map");
       try {
         await _remoteDatasource.addFromLocalBuffer(transactions: map, remoteId: remoteId);
       } catch (e) {

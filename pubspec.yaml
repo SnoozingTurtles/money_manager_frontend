@@ -79,6 +79,11 @@ flutter:
   assets:
     - assets/splash_screen/money_manager.gif
     - assets/landing_screen/landing_page.png
+    - assets/auth_page/cross.png
+    - assets/auth_page/email.png
+    - assets/auth_page/pass.png
+    - assets/auth_page/name.png
+    - assets/common/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

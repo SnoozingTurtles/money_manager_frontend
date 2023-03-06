@@ -48,12 +48,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await syncAllTransactionUseCase.executeRemoteToLocal(remoteId: id);
         emit(AuthAuthenticated(remoteId: id));
       }else{
-        String message = response.fold((l) => l.message??"Error Occured", (r) => 'null');
+        String message = response.fold((l) => l.message??"Error Occurred", (r) => 'null');
         emit(AuthUnauthenticated(error: message));
       }
     });
     on<SignUpEvent>((event, emit) async {
-      // print('signup');
       emit(AuthLoading());
       Either<Failure,UserId> response = await _userRepository.signUp(email: event.email, password: event.password, name: event.name);
       if(response.isRight()) {

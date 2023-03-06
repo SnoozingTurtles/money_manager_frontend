@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/presentation/auth_views/auth_view.dart';
+import 'package:money_manager/presentation/auth_views/login_view.dart';
 import 'package:money_manager/presentation/constants.dart';
 import 'package:money_manager/presentation/dashboard.dart';
+
+import '../auth_views/signup_view.dart';
 
 class LandingPage extends StatelessWidget {
   static const route = "/LandingPage";
@@ -60,7 +62,7 @@ class LandingPage extends StatelessWidget {
                             width: 160,
                             height: 50,
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed(AuthScreen.route);
+                              Navigator.of(context).pushReplacementNamed(SignUpView.route);
                             },
                           ),
                           XButton(
@@ -69,7 +71,7 @@ class LandingPage extends StatelessWidget {
                             width: 160,
                             height: 50,
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed(AuthScreen.route);
+                              Navigator.of(context).pushReplacementNamed(LoginView.route);
                             },
                           ),
                         ],

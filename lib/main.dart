@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 import 'package:money_manager/infrastructure/repository/user_repository.dart';
-import 'package:money_manager/presentation/auth_views/auth_view.dart';
+import 'package:money_manager/presentation/auth_views/login_view.dart';
+import 'package:money_manager/presentation/auth_views/signup_view.dart';
 import 'package:money_manager/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:money_manager/presentation/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:money_manager/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:money_manager/presentation/dashboard.dart';
 import 'package:money_manager/presentation/landing_views/landing_page.dart';
-
 import 'package:money_manager/presentation/splash_view/splash.dart';
-import 'package:money_manager/presentation/theme.dart';
-import 'package:money_manager/presentation/transaction_views/transaction_view.dart';
+
+import 'package:money_manager/presentation/transaction_views/transaction_form_view.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 import 'infrastructure/factory/db_factory.dart';
@@ -39,13 +40,19 @@ void main() async {
                   userRepository: RepositoryProvider.of<UserRepository>(context),
                 ),
               ),
+              BlocProvider<DashBoardBloc>(
+                  create: (context) => DashBoardBloc(
+                        transactionRepository: RepositoryProvider.of<TransactionRepository>(context),
+                        userBloc: BlocProvider.of<UserBloc>(context),
+                      )..add(LoadTransactionsThisMonthEvent())),
             ],
             child: MaterialApp(
               home: SplashScreen(),
               routes: {
                 DashBoard.route: (context) => const DashBoard(),
-                AuthScreen.route: (context) => const AuthScreen(),
-                TransactionView.route: (context) => const TransactionView(),
+                SignUpView.route: (context) => SignUpView(),
+                LoginView.route: (context) => LoginView(),
+                TransactionFormView.route: (context) => const TransactionFormView(),
                 LandingPage.route: (context) => const LandingPage(),
               },
               theme: ThemeData(

@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
-abstract class TransactionDTO extends Equatable{
+abstract class TransactionDTO extends Equatable {
   final Amount amount;
   final Category category; //IncomeDTO category
   final Note? note;

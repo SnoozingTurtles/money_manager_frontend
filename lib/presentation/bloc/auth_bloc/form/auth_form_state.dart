@@ -2,22 +2,35 @@ part of 'auth_form_bloc.dart';
 
 @immutable
 class AuthFormState extends Equatable {
+  final Name name;
   final Email email;
   final Password password;
-  final bool signUp;
-  const AuthFormState({
-    required this.email,
-    required this.password,
-    required this.signUp,
-  });
+  final Password confirmPassword;
+  final bool isValid;
+  const AuthFormState(
+      {required this.name,
+      required this.email,
+      required this.password,
+      required this.isValid,
+      required this.confirmPassword});
 
   factory AuthFormState.initial() {
-    return AuthFormState(email: Email(''), password: Password(''),signUp: true);
+    return AuthFormState(
+        email: Email(''),
+        password: Password(''),
+        isValid: false,
+        name: Name(''),
+        confirmPassword: Password.signUp('', ''));
   }
   @override
-  List<Object> get props => [email, password,signUp];
+  List<Object> get props => [email, password, isValid, name, confirmPassword];
 
-  AuthFormState copyWith({Email? email, Password? password,bool?signUp}) {
-    return AuthFormState(email: email ?? this.email, password: password ?? this.password,signUp:signUp??this.signUp);
+  AuthFormState copyWith({Email? email, Password? password, bool? isValid, Password? confirmPassword, Name? name}) {
+    return AuthFormState(
+        name: name ?? this.name,
+        email: email ?? this.email,
+        confirmPassword: confirmPassword ?? this.confirmPassword,
+        password: password ?? this.password,
+        isValid: isValid ?? this.isValid);
   }
 }

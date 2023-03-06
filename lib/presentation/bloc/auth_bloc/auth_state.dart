@@ -11,7 +11,6 @@ class AuthUninitialized extends AuthState {
 }
 
 class AuthAuthenticated extends AuthState {
-  // final String jwtToken,email;
   final UserId remoteId;
   const AuthAuthenticated({required this.remoteId});
 

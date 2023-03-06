@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/domain/value_objects/value_failure.dart';
@@ -28,8 +31,9 @@ class Note extends Equatable {
   List<Object?> get props => [value];
 }
 
-class Category extends Equatable {
+class Category extends Equatable implements Comparable<Category> {
   final Either<Failure, String> value;
+  final Color color = Color(Random().nextInt(0xffffffff));
 
   factory Category(String value) {
     return Category._(
@@ -37,9 +41,19 @@ class Category extends Equatable {
           .flatMap((a) => validateSingleLine(a).flatMap((string) => validateMaxStringLength(string, 10))),
     );
   }
-  const Category._(this.value);
+  Category._(this.value);
 
   @override
   List<Object?> get props => [value];
-}
 
+  @override
+  String toString() {
+    return 'cat: ${this.value}';
+  }
+
+  @override
+  int compareTo(Category other) {
+    String otherVal = other.value.fold((l) => 'l', (r) => r);
+    return otherVal.compareTo(this.value.fold((l) => '', (r) => r));
+  }
+}
