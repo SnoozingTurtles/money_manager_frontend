@@ -16,10 +16,11 @@
 * [Resources](#resources)
 * [Reporting Issues](#reporting-issues)
 * [Licensing](#licensing)
-<!-- 
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/galio-org/galio-org.github.io/master/img/readme3.jpg">
-</p> -->
+  <img src="https://github.com/SnoozingTurtles/money_manager_frontend/blob/development/screenshots/1.png">
+  <img src="https://github.com/SnoozingTurtles/money_manager_frontend/blob/development/screenshots/2.png">
+</p> 
 
 ## Quick Start
 
