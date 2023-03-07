@@ -22,7 +22,7 @@
   <img src="https://github.com/SnoozingTurtles/money_manager_frontend/blob/development/screenshots/2.png">
 </p> 
 
-## Quick Start
+#### Quick Start
 
 #### 1. Project Setup
 ```bash
@@ -33,9 +33,11 @@ flutter build
 ```
 
 #### 2. Starting the local server for your app (Optional)
+## App is built to function both offline and online with optional authentication for backups and additional functionalities.
 Terminal cli:
 ```bash
 git clone https://github.com/SnoozingTurtles/money_manager_backend.git
+mvn spring-boot:run
 ```
 
 
