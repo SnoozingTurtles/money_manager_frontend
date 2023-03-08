@@ -29,7 +29,7 @@
 git clone https://github.com/SnoozingTurtles/money_manager_frontend.git
 cd money_manager_frontend
 flutter pub get 
-flutter build
+flutter run
 ```
 
 #### 2. Starting the local server for your app (Optional)
