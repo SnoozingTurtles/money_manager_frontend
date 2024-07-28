@@ -1,7 +1,6 @@
 part of 'stats_bloc.dart';
 
-@immutable
-abstract class StatsEvent extends Equatable{}
+abstract class StatsEvent extends Equatable {}
 
 class MapCategoryEvent extends StatsEvent {
   final List<TransactionDTO> categoryMap;

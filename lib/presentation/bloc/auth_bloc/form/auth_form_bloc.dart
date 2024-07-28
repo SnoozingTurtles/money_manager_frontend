@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 import 'package:money_manager/domain/value_objects/user/value_objects.dart';
 
 part 'auth_form_event.dart';
@@ -22,10 +21,11 @@ class AuthFormBloc extends Bloc<AuthFormEvent, AuthFormState> {
       emit(state.copyWith(isValid: false));
     });
     on<ChangeConfirmPassword>((event, emit) {
-      if (event.confirmPassword.isNotEmpty)
+      if (event.confirmPassword.isNotEmpty) {
         emit(state.copyWith(
             confirmPassword:
                 Password.signUp(state.password.password.fold((l) => '', (r) => r), event.confirmPassword)));
+      }
     });
     on<ValidateSignIn>((event, emit) {
       emit(state.copyWith(isValid: false));

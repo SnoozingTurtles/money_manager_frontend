@@ -1,6 +1,5 @@
 part of 'auth_form_bloc.dart';
 
-@immutable
 abstract class AuthFormEvent extends Equatable {
   const AuthFormEvent();
 }
@@ -10,6 +9,7 @@ class ValidateSignUp extends AuthFormEvent {
   @override
   List<Object?> get props => [];
 }
+
 class ValidateSignIn extends AuthFormEvent {
   const ValidateSignIn();
   @override
@@ -21,6 +21,7 @@ class Invalidate extends AuthFormEvent {
   @override
   List<Object?> get props => [];
 }
+
 class ChangeEmailEvent extends AuthFormEvent {
   final String email;
   const ChangeEmailEvent({required this.email});

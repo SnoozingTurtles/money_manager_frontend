@@ -4,21 +4,39 @@ import 'package:flutter/material.dart';
 import 'package:money_manager/domain/value_objects/transaction/value_objects.dart';
 
 class PieChartCase extends StatelessWidget {
-  final Map<Category,int> categoryMapping;
-  PieChartCase({required this.categoryMapping,Key? key}) : super(key: key);
+  final Map<Category, int> categoryMapping;
+  const PieChartCase({required this.categoryMapping, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraint) {
         return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            shape: BoxShape.circle,
+            boxShadow: const [
+              BoxShadow(
+                spreadRadius: -10,
+                blurRadius: 17,
+                offset: Offset(-5, -5),
+                color: Color.fromRGBO(146, 182, 216, 1),
+              ),
+              BoxShadow(
+                spreadRadius: -2,
+                blurRadius: 10,
+                offset: Offset(7, 7),
+                color: Color.fromRGBO(146, 182, 216, 1),
+              )
+            ],
+          ),
           child: Stack(children: [
             Center(
               child: SizedBox(
                 width: constraint.maxWidth * 0.4,
                 child: CustomPaint(
-                  child: Center(),
                   foregroundPainter: PieChart(width: constraint.maxWidth * 0.37, categories: categoryMapping),
+                  child: const Center(),
                 ),
               ),
             ),
@@ -28,7 +46,7 @@ class PieChartCase extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   shape: BoxShape.circle,
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       spreadRadius: -10,
                       blurRadius: 17,
@@ -43,30 +61,12 @@ class PieChartCase extends StatelessWidget {
                     )
                   ],
                 ),
-                child: Center(
+                child: const Center(
                   child: Text("Rs 1000"),
                 ),
               ),
             ),
           ]),
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                spreadRadius: -10,
-                blurRadius: 17,
-                offset: Offset(-5, -5),
-                color:Color.fromRGBO(146, 182, 216, 1),
-              ),
-              BoxShadow(
-                spreadRadius: -2,
-                blurRadius: 10,
-                offset: Offset(7, 7),
-                color: Color.fromRGBO(146, 182, 216, 1),
-              )
-            ],
-          ),
         );
       },
     );
@@ -107,6 +107,7 @@ class PieChart extends CustomPainter {
       startRadian += sweepRadian;
     });
   }
+
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;

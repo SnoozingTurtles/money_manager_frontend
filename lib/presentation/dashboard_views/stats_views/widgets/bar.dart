@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class Bar extends StatelessWidget {
   const Bar({
+    super.key,
     required this.width,
     required this.height,
     required this.value,
@@ -19,12 +20,12 @@ class Bar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final innerContainerWidth = value;
-    final innerContainerHeight = height ;
+    final innerContainerHeight = height;
     return Column(
       children: <Widget>[
-        Container(
+        SizedBox(
           height: height * 1.01,
-          width: width *1,
+          width: width * 1,
           child: Stack(
             children: <Widget>[
               DugContainer(
@@ -42,6 +43,7 @@ class Bar extends StatelessWidget {
 
 class InnerContainer extends StatelessWidget {
   const InnerContainer({
+    super.key,
     required this.height,
     required this.width,
     required this.color,
@@ -61,18 +63,18 @@ class InnerContainer extends StatelessWidget {
           alignment: Alignment.bottomLeft,
           child: Container(
             height: height * 600 / 896,
-            width: width*1 ,//dynamic update
+            width: width * 1, //dynamic update
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(95.0),
-              color: color ,
+              color: color,
               boxShadow: [
-                BoxShadow(
+                const BoxShadow(
                   offset: Offset(1.5, 1.5),
                   color: Colors.black38,
                   blurRadius: 2,
                 ),
                 BoxShadow(
-                  offset: Offset(-1.5, -1.5),
+                  offset: const Offset(-1.5, -1.5),
                   color: color,
                   blurRadius: 2,
                 )
@@ -87,6 +89,7 @@ class InnerContainer extends StatelessWidget {
 
 class DugContainer extends StatelessWidget {
   const DugContainer({
+    super.key,
     required this.height,
     required this.width,
   });
@@ -98,9 +101,9 @@ class DugContainer extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       child: Container(
         height: height * 600 / 896,
-        width: width *1,
+        width: width * 1,
         decoration: BoxDecoration(
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: exteriorShadow,
               offset: Offset(0.0, 0.0),

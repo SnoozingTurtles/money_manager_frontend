@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -82,10 +81,7 @@ class DashBoardBloc extends Bloc<DashBoardEvent, DashBoardState> {
           event.startDate.toIso8601String(), event.endDate.toIso8601String());
       var transactions = getAllTransactionOutput.transactions;
       await _reloadUserBalance(transactions);
-      emit(DashBoardLoaded(
-          transactions: transactions,
-          syncLoading: false,
-          filter: "custom"));
+      emit(DashBoardLoaded(transactions: transactions, syncLoading: false, filter: "custom"));
     });
   }
 

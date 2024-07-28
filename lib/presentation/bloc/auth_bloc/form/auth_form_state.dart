@@ -1,6 +1,5 @@
 part of 'auth_form_bloc.dart';
 
-@immutable
 class AuthFormState extends Equatable {
   final Name name;
   final Email email;

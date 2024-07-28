@@ -6,6 +6,7 @@ import 'package:money_manager/presentation/constants.dart';
 import 'package:money_manager/presentation/dashboard_views/home_view.dart';
 import 'package:money_manager/presentation/landing_views/landing_page.dart';
 import 'package:money_manager/presentation/transaction_views/transaction_form_view.dart';
+
 import 'dashboard_views/stats_views/stats_view.dart';
 import 'dashboard_views/transaction_view.dart';
 
@@ -18,7 +19,7 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
-  final List<Widget> _views = [HomeView(), const TransactionView(), StatsView(), HomeView()];
+  final List<Widget> _views = [const HomeView(), const TransactionView(), const StatsView(), const HomeView()];
   int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class _DashBoardState extends State<DashBoard> {
                   top: 8.0,
                   left: 24.0,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   child: Text(
                     '${weekday[DateTime.now().weekday - 1]} ${DateTime.now().day} ${month[DateTime.now().month - 1]}',
@@ -54,7 +55,9 @@ class _DashBoardState extends State<DashBoard> {
                   IconButton(
                       onPressed: () async {
                         await SecureStorage().deleteToken();
-                        Navigator.of(context).pushReplacementNamed(LandingPage.route);
+                        if (context.mounted) {
+                          Navigator.of(context).pushReplacementNamed(LandingPage.route);
+                        }
                       },
                       icon: Image.asset('assets/common/profile.png')),
                 ]),
@@ -74,7 +77,7 @@ class _DashBoardState extends State<DashBoard> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ChoiceChip(
-                                label: Text('This Month'),
+                                label: const Text('This Month'),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                 onSelected: (val) {
                                   BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsThisMonthEvent());
@@ -82,26 +85,26 @@ class _DashBoardState extends State<DashBoard> {
                                 labelStyle:
                                     TextStyle(color: state.filter == "This Month" ? Colors.white : Colors.black),
                                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                selectedColor: Color(0xFF486C7C),
+                                selectedColor: const Color(0xFF486C7C),
                                 selected: state.filter == 'This Month'),
                             ChoiceChip(
-                                label: Text('Last Month'),
+                                label: const Text('Last Month'),
                                 labelStyle:
                                     TextStyle(color: state.filter == "Last Month" ? Colors.white : Colors.black),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                 onSelected: (val) {
                                   BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsLastMonthEvent());
                                 },
-                                selectedColor: Color(0xFF486C7C),
+                                selectedColor: const Color(0xFF486C7C),
                                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                 selected: state.filter == 'Last Month'),
                             ChoiceChip(
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                label: Text('Last 3 Months'),
+                                label: const Text('Last 3 Months'),
                                 onSelected: (val) {
                                   BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsLast3MonthEvent());
                                 },
-                                selectedColor: Color(0xFF486C7C),
+                                selectedColor: const Color(0xFF486C7C),
                                 labelStyle:
                                     TextStyle(color: state.filter == "Last 3 Months" ? Colors.white : Colors.black),
                                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -110,48 +113,48 @@ class _DashBoardState extends State<DashBoard> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                 labelStyle:
                                     TextStyle(color: state.filter == "Last 6 Months" ? Colors.white : Colors.black),
-                                label: Text('Last 6 Months'),
+                                label: const Text('Last 6 Months'),
                                 onSelected: (val) {
                                   BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsLast6MonthEvent());
                                 },
-                                selectedColor: Color(0xFF486C7C),
+                                selectedColor: const Color(0xFF486C7C),
                                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                 selected: state.filter == "Last 6 Months"),
                             ChoiceChip(
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                label: Text('All time'),
+                                label: const Text('All time'),
                                 labelStyle: TextStyle(color: state.filter == "All Time" ? Colors.white : Colors.black),
                                 onSelected: (val) {
                                   BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionEvent());
                                 },
-                                selectedColor: Color(0xFF486C7C),
+                                selectedColor: const Color(0xFF486C7C),
                                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                 selected: state.filter == "All Time"),
                             ChoiceChip(
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                label: Text('Custom'),
+                                label: const Text('Custom'),
                                 labelStyle: TextStyle(color: state.filter == "Custom" ? Colors.white : Colors.black),
                                 onSelected: (val) async {
-                                  var output = await Future.delayed(
-                                      const Duration(seconds: 0),
-                                      () async => await showDateRangePicker(
-                                            context: context,
-                                            firstDate: DateTime.now().subtract(const Duration(days: 360)),
-                                            lastDate: DateTime.now().add(const Duration(days: 360)),
-                                          ));
+                                  var output = await Future.delayed(const Duration(seconds: 0), () async {
+                                    return await showDateRangePicker(
+                                      context: context,
+                                      firstDate: DateTime.now().subtract(const Duration(days: 360)),
+                                      lastDate: DateTime.now().add(const Duration(days: 360)),
+                                    );
+                                  });
                                   if (output != null) {
                                     BlocProvider.of<DashBoardBloc>(context)
                                         .add(LoadTransactionsCustomEvent(startDate: output.start, endDate: output.end));
                                   }
                                 },
-                                selectedColor: Color(0xFF486C7C),
+                                selectedColor: const Color(0xFF486C7C),
                                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                 selected: state.filter == "custom"),
                           ],
                         ),
                       );
                     } else {
-                      return LinearProgressIndicator();
+                      return const LinearProgressIndicator();
                     }
                   },
                 ),
@@ -189,11 +192,11 @@ class _DashBoardState extends State<DashBoard> {
             }),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          backgroundColor: Color(0xFF486C7C),
+          backgroundColor: const Color(0xFF486C7C),
           onPressed: () {
             Navigator.of(context).pushNamed(TransactionFormView.route);
           },
+          child: const Icon(Icons.add),
         ),
       ),
     );

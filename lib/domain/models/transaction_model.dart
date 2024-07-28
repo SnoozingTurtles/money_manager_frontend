@@ -12,7 +12,7 @@ abstract class Transaction extends Equatable {
   final bool recurring;
   final String? token;
 
-  Transaction(
+  const Transaction(
       {required this.localId,
       required this.amount,
       required this.category,
@@ -23,7 +23,7 @@ abstract class Transaction extends Equatable {
 }
 
 class Income extends Transaction {
-  Income(
+  const Income(
       {required Amount amount,
       required Category category,
       required UserId localId,
@@ -48,7 +48,7 @@ class Income extends Transaction {
         amount: Amount("${map["amount"]}"),
         category: Category("${map["category"]}"),
         dateTime: DateTime.parse("${map['dateAdded']}"),
-        recurring: bool.fromEnvironment("false"),
+        recurring: const bool.fromEnvironment("false"),
         note: map['description'] == null ? null : Note(map['description']!));
   }
 
@@ -70,7 +70,7 @@ class Income extends Transaction {
       "category": category.value.fold((l) => null, (r) => r),
       "dateTime": dateTime.toIso8601String(),
       "recurring": recurring.toString(),
-      "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "note": note?.value.fold((l) => null, (r) => r),
     };
   }
 
@@ -80,7 +80,7 @@ class Income extends Transaction {
       "type": category.value.fold((l) => null, (r) => r),
       "dateAdded": dateTime.toIso8601String(),
       // "recurring": recurring.toString(),
-      "description": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "description": note?.value.fold((l) => null, (r) => r),
     };
   }
 
@@ -91,19 +91,18 @@ class Income extends Transaction {
       "category": category.value.fold((l) => null, (r) => r),
       "dateTime": dateTime.toIso8601String(),
       "recurring": recurring.toString(),
-      "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "note": note?.value.fold((l) => null, (r) => r),
       "transactionType": "income",
     };
   }
 
   @override
-  // TODO: implement props
   List<Object?> get props => [amount, category, note, dateTime, recurring];
 }
 
 class Expense extends Transaction {
   final String medium; //account, cash, card
-  Expense(
+  const Expense(
       {required Amount amount,
       required UserId localId,
       required Category category,
@@ -137,7 +136,7 @@ class Expense extends Transaction {
         amount: Amount("${map["amount"]}"),
         category: Category("${map["category"]}"),
         dateTime: DateTime.parse("${map['dateAdded']}"),
-        recurring: bool.fromEnvironment("false"),
+        recurring: const bool.fromEnvironment("false"),
         note: map['description'] == null ? null : Note(map['description']!));
   }
 
@@ -160,7 +159,7 @@ class Expense extends Transaction {
       "category": category.value.fold((l) => null, (r) => r),
       "dateTime": dateTime.toIso8601String(),
       "recurring": recurring.toString(),
-      "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "note": note?.value.fold((l) => null, (r) => r),
       "medium": medium.toString(),
     };
   }
@@ -171,7 +170,7 @@ class Expense extends Transaction {
       "category": category.value.fold((l) => null, (r) => r),
       "dateAdded": dateTime.toIso8601String(),
       // "recurring": recurring.toString(),
-      "description": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "description": note?.value.fold((l) => null, (r) => r),
       "type": medium.toString(),
     };
   }
@@ -183,13 +182,12 @@ class Expense extends Transaction {
       "category": category.value.fold((l) => null, (r) => r),
       "dateTime": dateTime.toIso8601String(),
       "recurring": recurring.toString(),
-      "note": note != null ? note!.value.fold((l) => null, (r) => r) : null,
+      "note": note?.value.fold((l) => null, (r) => r),
       "medium": medium.toString(),
       "transactionType": "expense"
     };
   }
 
   @override
-  // TODO: implement props
   List<Object?> get props => [amount, category, note, dateTime, recurring, medium];
 }

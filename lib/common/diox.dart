@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:money_manager/common/secure_storage.dart';
 
 class Api {
@@ -29,7 +28,7 @@ class Api {
       // accessToken ??= '';
       return handler.next(options);
     }, onError: (DioError error, handler) async {
-      debugPrint('DIOX:ON ERROR: ${error}');
+      debugPrint('DIOX:ON ERROR: $error');
       if ((error.response?.statusCode == 400 && error.response?.data['message'] == "JWT token has expired!")) {
         debugPrint('Checking for refresh token');
         if (await _storage.hasRefreshToken()) {
@@ -52,10 +51,13 @@ class Api {
     if (requestOptions.data is FormData) {
       String transactionType = requestOptions.data.files[0].key.toString();
       debugPrint(transactionType);
-      FormData formData = FormData.fromMap({
-        transactionType:
-            MultipartFile.fromString(jsonEncode(requestOptions.extra), contentType: MediaType.parse('application/json'))
-      });
+      FormData formData = FormData.fromMap(
+        {
+          transactionType: MultipartFile.fromString(
+            jsonEncode(requestOptions.extra),
+          )
+        },
+      );
       requestOptions.data = formData;
     }
 

@@ -10,6 +10,7 @@ class DatabaseFactory {
     var database = await openDatabase(dbPath, version: 1, onCreate: populateDb);
     return database;
   }
+
   void populateDb(Database db, int version) async {
     await _createUserTable(db);
     await _createExpenseTable(db);
@@ -17,7 +18,7 @@ class DatabaseFactory {
     await _createBufferTable(db);
   }
 
-  _createUserTable(Database db) async{
+  _createUserTable(Database db) async {
     await db.execute("""CREATE TABLE user(
     userId INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -28,6 +29,7 @@ class DatabaseFactory {
     remoteId INTEGER
     );""");
   }
+
   _createExpenseTable(Database db) async {
     await db
         .execute("""CREATE TABLE expense(
@@ -41,14 +43,11 @@ class DatabaseFactory {
     FOREIGN KEY(userId) REFERENCES user(userId)
     );""")
         .then((_) => print('creating expense table....'))
-        .catchError(
-            (onError) => print('error creating expense table $onError'));
-
-
+        .catchError((onError) => print('error creating expense table $onError'));
   }
 
   _createIncomeTable(Database db) async {
-     await db
+    await db
         .execute("""CREATE TABLE income(
     amount TEXT,
     category TEXT,
@@ -62,7 +61,7 @@ class DatabaseFactory {
         .catchError((onError) => print('error creating income table $onError'));
   }
 
-  _createBufferTable(Database db)async{
+  _createBufferTable(Database db) async {
     await db.execute("""CREATE TABLE buffer(
     amount TEXT ,
     category TEXT,
@@ -75,9 +74,9 @@ class DatabaseFactory {
     FOREIGN KEY(userId) REFERENCES user(userId)
     );""");
   }
+
   dropAllTables(Database db) async {
     await db.delete('expense');
     await db.delete('income');
   }
-
 }

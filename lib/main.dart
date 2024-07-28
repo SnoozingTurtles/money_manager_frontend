@@ -10,7 +10,6 @@ import 'package:money_manager/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:money_manager/presentation/dashboard.dart';
 import 'package:money_manager/presentation/landing_views/landing_page.dart';
 import 'package:money_manager/presentation/splash_view/splash.dart';
-
 import 'package:money_manager/presentation/transaction_views/transaction_form_view.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
@@ -44,19 +43,19 @@ void main() async {
                   create: (context) => DashBoardBloc(
                         transactionRepository: RepositoryProvider.of<TransactionRepository>(context),
                         userBloc: BlocProvider.of<UserBloc>(context),
-                      )..add(LoadTransactionsThisMonthEvent())),
+                      )..add(const LoadTransactionsThisMonthEvent())),
             ],
             child: MaterialApp(
-              home: SplashScreen(),
+              home: const SplashScreen(),
               routes: {
                 DashBoard.route: (context) => const DashBoard(),
-                SignUpView.route: (context) => SignUpView(),
-                LoginView.route: (context) => LoginView(),
+                SignUpView.route: (context) => const SignUpView(),
+                LoginView.route: (context) => const LoginView(),
                 TransactionFormView.route: (context) => const TransactionFormView(),
                 LandingPage.route: (context) => const LandingPage(),
               },
               theme: ThemeData(
-                primaryColor: Color(0xFF486C7C),
+                primaryColor: const Color(0xFF486C7C),
                 textTheme: const TextTheme(
                   displayLarge: TextStyle(
                     fontSize: 30,

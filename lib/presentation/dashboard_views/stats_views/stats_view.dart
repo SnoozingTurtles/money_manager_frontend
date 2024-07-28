@@ -21,7 +21,7 @@ class StatsView extends StatelessWidget {
           child: BlocBuilder<StatsBloc, StatsState>(
             builder: (context, state) {
               if (state is StatsLoaded) {
-                return Container(
+                return SizedBox(
                   height: height * 0.7,
                   child: Column(children: [
                     SizedBox(
@@ -40,7 +40,7 @@ class StatsView extends StatelessWidget {
                               totalMoney += value1;
                             }
                             return Container(
-                              margin: EdgeInsets.all(12),
+                              margin: const EdgeInsets.all(12),
                               height: height * 0.08,
                               child: Column(children: [
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -51,7 +51,7 @@ class StatsView extends StatelessWidget {
                                   color: cList[index].color,
                                   height: height * 0.04,
                                   width: width,
-                                  value: (vList[index]/totalMoney)*width,
+                                  value: (vList[index] / totalMoney) * width,
                                 ),
                               ]),
                             );
@@ -60,42 +60,14 @@ class StatsView extends StatelessWidget {
                   ]),
                 );
               } else {
-                return CircularProgressIndicator();
+                return const CircularProgressIndicator();
               }
             },
           ),
         );
       } else {
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       }
     });
-  }
-
-  Widget _buildSwitches(StatsState state, BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ChoiceChip(
-            label: Text('Expense'),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            onSelected: (val) {
-              // BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsThisMonthEvent());
-            },
-            labelStyle: TextStyle(color: true ? Colors.white : Colors.black, fontSize: 25),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            selectedColor: Color(0xFF486C7C),
-            selected: true),
-        ChoiceChip(
-            label: Text('Income'),
-            labelStyle: TextStyle(color: false ? Colors.white : Colors.black, fontSize: 25),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            onSelected: (val) {
-              // BlocProvider.of<DashBoardBloc>(context).add(const LoadTransactionsLastMonthEvent());
-            },
-            selectedColor: Color(0xFF486C7C),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            selected: false),
-      ],
-    );
   }
 }

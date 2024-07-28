@@ -35,7 +35,7 @@ class TransactionFormView extends StatefulWidget {
 
   Widget _buildCategoryPicker(TransactionFormState state, BuildContext context) {
     return ListTile(
-      leading: Icon(Icons.category),
+      leading: const Icon(Icons.category),
       title: InkWell(
         onTap: () async {
           await showDialog(
@@ -88,7 +88,7 @@ class TransactionFormView extends StatefulWidget {
     return ListTile(
       leading: const Icon(Icons.note),
       title: TextFormField(
-        validator: (_) => state.note != null ? state.note!.value.fold((l) => l.message, (r) => null) : null,
+        validator: (_) => state.note?.value.fold((l) => l.message, (r) => null),
         onChanged: (value) {
           BlocProvider.of<TransactionFormBloc>(context).add(ChangeNoteEvent(note: value));
         },
@@ -120,7 +120,9 @@ class TransactionFormView extends StatefulWidget {
                     milliseconds: DateTime.now().millisecond));
 
                 debugPrint(date.toIso8601String());
-                BlocProvider.of<TransactionFormBloc>(context).add(ChangeDateEvent(date: date));
+                if (context.mounted) {
+                  BlocProvider.of<TransactionFormBloc>(context).add(ChangeDateEvent(date: date));
+                }
               },
               child: TextFormField(
                 decoration: mInputDecoration('Date'),
@@ -208,7 +210,7 @@ class _TransactionFormViewState extends State<TransactionFormView> {
           },
           builder: (context, state) {
             return Scaffold(
-              backgroundColor: state.income ? Colors.green : Color.fromRGBO(253, 60, 74, 0.61),
+              backgroundColor: state.income ? Colors.green : const Color.fromRGBO(253, 60, 74, 0.61),
               body: Form(
                 key: TransactionFormView.formKey,
                 child: Column(children: [
@@ -220,7 +222,7 @@ class _TransactionFormViewState extends State<TransactionFormView> {
                     ),
                     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.arrow_back_rounded,
                           color: Colors.white,
                         ),
@@ -228,10 +230,10 @@ class _TransactionFormViewState extends State<TransactionFormView> {
                           Navigator.of(context).pop();
                         },
                       ),
-                      Text('${state.income ? 'Income' : 'Expense'}',
+                      Text(state.income ? 'Income' : 'Expense',
                           style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.white)),
                       IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.currency_exchange,
                           color: Colors.white,
                         ),
@@ -247,7 +249,7 @@ class _TransactionFormViewState extends State<TransactionFormView> {
                   Expanded(
                     flex: 2,
                     child: BottomSheet(
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
                       ),
                       onClosing: () {},
@@ -309,7 +311,7 @@ class _CategoryPickerState extends State<CategoryPicker> {
                     selected: selectedCategory == categoryText,
                     onSelected: (value) {
                       if (selectedCategory == categoryText) {
-                        BlocProvider.of<TransactionFormBloc>(context).add(ChangeCategoryEvent(category: ""));
+                        BlocProvider.of<TransactionFormBloc>(context).add(const ChangeCategoryEvent(category: ""));
                       } else {
                         BlocProvider.of<TransactionFormBloc>(context).add(ChangeCategoryEvent(category: categoryText));
                       }
@@ -332,7 +334,7 @@ class _CategoryPickerState extends State<CategoryPicker> {
                       ),
                     ),
                   IconButton(
-                      icon: Icon(Icons.add_circle_outline_rounded),
+                      icon: const Icon(Icons.add_circle_outline_rounded),
                       onPressed: () async {
                         setState(() {
                           showAdder = !showAdder;

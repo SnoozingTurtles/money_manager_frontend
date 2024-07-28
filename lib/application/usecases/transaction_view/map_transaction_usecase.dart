@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
 
 extension Iterables<E> on Iterable<E> {

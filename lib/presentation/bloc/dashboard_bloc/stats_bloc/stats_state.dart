@@ -1,6 +1,5 @@
 part of 'stats_bloc.dart';
 
-@immutable
 abstract class StatsState extends Equatable {}
 
 class StatsInitial extends StatsState {

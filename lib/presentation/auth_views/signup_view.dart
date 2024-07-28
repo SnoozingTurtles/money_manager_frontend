@@ -11,6 +11,9 @@ import '../dashboard.dart';
 class SignUpView extends StatelessWidget {
   static const route = '/SignUpView';
 
+  const SignUpView({super.key});
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider<AuthFormBloc>(
       create: (context) => AuthFormBloc(),
@@ -21,7 +24,7 @@ class SignUpView extends StatelessWidget {
             Navigator.of(context).pushReplacementNamed(DashBoard.route);
           } else if (state is AuthUnauthenticated) {
             BlocProvider.of<UserBloc>(context).add(InitUser());
-            BlocProvider.of<AuthFormBloc>(context).add(Invalidate());
+            BlocProvider.of<AuthFormBloc>(context).add(const Invalidate());
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error),
@@ -67,7 +70,7 @@ class SignUpView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
                           child: XField(
-                              icon_file_name: 'name.png',
+                              iconFileName: 'name.png',
                               validator: (_) {
                                 return state.name.name.fold((l) => l.message, (r) => null);
                               },
@@ -79,7 +82,7 @@ class SignUpView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
                           child: XField(
-                              icon_file_name: 'email.png',
+                              iconFileName: 'email.png',
                               validator: (_) {
                                 return state.email.email.fold((l) => l.message, (r) => null);
                               },
@@ -91,7 +94,7 @@ class SignUpView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
                           child: XField(
-                              icon_file_name: 'pass.png',
+                              iconFileName: 'pass.png',
                               validator: (_) {
                                 return state.password.password.fold((l) => l.message, (r) => null);
                               },
@@ -103,7 +106,7 @@ class SignUpView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
                           child: XField(
-                              icon_file_name: 'pass.png',
+                              iconFileName: 'pass.png',
                               validator: (_) {
                                 return state.confirmPassword.password.fold((l) => l.message, (r) => null);
                               },
@@ -114,10 +117,10 @@ class SignUpView extends StatelessWidget {
                               value: "Confirm Password"),
                         ),
                         state.isValid
-                            ? CircularProgressIndicator()
+                            ? const CircularProgressIndicator()
                             : XButton(
                                 onPressed: () {
-                                  BlocProvider.of<AuthFormBloc>(context).add(ValidateSignUp());
+                                  BlocProvider.of<AuthFormBloc>(context).add(const ValidateSignUp());
                                 },
                                 alter: false,
                                 width: MediaQuery.of(context).size.width,

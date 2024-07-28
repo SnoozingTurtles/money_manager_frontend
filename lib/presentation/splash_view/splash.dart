@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/presentation/auth_views/login_view.dart';
 import 'package:money_manager/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:money_manager/presentation/dashboard.dart';
 
@@ -17,14 +16,14 @@ class SplashScreen extends StatelessWidget {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Color(0xFF486C7C),
+      backgroundColor: const Color(0xFF486C7C),
       body: BlocListener<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserLoaded) {
             if (!state.firstRun) {
-              Timer(Duration(seconds: 5), () => Navigator.of(context).pushReplacementNamed(DashBoard.route));
+              Timer(const Duration(seconds: 5), () => Navigator.of(context).pushReplacementNamed(DashBoard.route));
             } else {
-              Timer(Duration(seconds: 5), () => Navigator.of(context).pushReplacementNamed(LandingPage.route));
+              Timer(const Duration(seconds: 5), () => Navigator.of(context).pushReplacementNamed(LandingPage.route));
             }
           }
         },

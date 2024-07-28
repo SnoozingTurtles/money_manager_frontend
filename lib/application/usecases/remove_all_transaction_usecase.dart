@@ -1,11 +1,11 @@
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 
-class RemoveAllTransactionUseCase{
-  TransactionRepository _transactionRepository;
+class RemoveAllTransactionUseCase {
+  final TransactionRepository _transactionRepository;
 
   RemoveAllTransactionUseCase({required TransactionRepository transactionRepository})
       : _transactionRepository = transactionRepository;
-  Future<void> execute()async{
+  Future<void> execute() async {
     await _transactionRepository.clearDB();
   }
 }

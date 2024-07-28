@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:money_manager/application/boundaries/sync_all_transactions/ISyncAllTransactionUseCase.dart';
+import 'package:money_manager/application/boundaries/sync_all_transactions/i_sync_all_transactions_use_case.dart';
 import 'package:money_manager/domain/value_objects/user/value_objects.dart';
 import 'package:money_manager/infrastructure/repository/transaction_repository.dart';
 

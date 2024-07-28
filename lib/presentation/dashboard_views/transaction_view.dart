@@ -24,9 +24,7 @@ class TransactionView extends StatelessWidget {
                   return XListTile(
                     amount: transaction[dIndex][index].amount.value.fold((l) => "Error", (r) => r),
                     title: transaction[dIndex][index].category.value.fold((l) => "Error", (r) => r),
-                    note: transaction[dIndex][index].note == null
-                        ? null
-                        : transaction[dIndex][index].note!.value.fold((l) => "null", (r) => r),
+                    note: transaction[dIndex][index].note?.value.fold((l) => "null", (r) => r),
                     transactionType: transaction[dIndex][index],
                   );
                 },
@@ -56,14 +54,14 @@ class TransactionView extends StatelessWidget {
                       child: listView(dateTime, transaction),
                     );
                   } else {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
                 },
               ),
             );
           }
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );

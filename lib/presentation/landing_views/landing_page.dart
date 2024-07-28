@@ -123,16 +123,16 @@ class XButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         fixedSize: Size(width, height),
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(12),
           ),
         ),
-        foregroundColor: alter ? Theme.of(context).primaryColor : Color(0xFFF2DA0E),
+        foregroundColor: alter ? Theme.of(context).primaryColor : const Color(0xFFF2DA0E),
         backgroundColor: alter ? Colors.white : Theme.of(context).primaryColor,
       ),
-      child: Text(text),
       onPressed: onPressed,
+      child: Text(text),
     );
   }
 }

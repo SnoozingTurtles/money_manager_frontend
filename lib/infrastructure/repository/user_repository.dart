@@ -47,7 +47,7 @@ class UserRepository implements IUserRepository, IAuthRepository {
   @override
   Future<Either<Failure, UserId>> signIn({required Email email, required Password password}) async {
     Dio dio = Dio();
-    SecureStorage _secureStorage = SecureStorage();
+    SecureStorage secureStorage = SecureStorage();
     String? fE = email.email.fold((l) => null, (r) => r);
     String? fP = password.password.fold((l) => null, (r) => r);
     var map = {'email': fE, 'password': fP};
@@ -58,7 +58,7 @@ class UserRepository implements IUserRepository, IAuthRepository {
       );
       var body = response.data;
       debugPrint("USER REPO: 56: signIn: $body");
-      await _secureStorage.persistEmailAndToken(fE!, body['accessToken'], '1', body['refreshToken']);
+      await secureStorage.persistEmailAndToken(fE!, body['accessToken'], '1', body['refreshToken']);
       return right(UserId(body['userId']));
     } on DioError catch (e) {
       return left(Failure(e.response?.data['message']));

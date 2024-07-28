@@ -3,16 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/application/boundaries/get_transactions/transaction_dto.dart';
+import 'package:money_manager/domain/models/transaction_model.dart';
 import 'package:money_manager/presentation/bloc/dashboard_bloc/dashboard_bloc.dart';
-import 'package:grouped_list/grouped_list.dart';
 
-import '../../domain/models/transaction_model.dart';
 import '../bloc/user_bloc/user_bloc.dart';
 import '../constants.dart';
 
 class HomeView extends StatefulWidget {
-  HomeView({Key? key}) : super(key: key);
-  late Future<List<Transaction>> tListTest;
+  const HomeView({Key? key}) : super(key: key);
+
   @override
   State<HomeView> createState() => _HomeViewState();
 }
@@ -29,6 +28,8 @@ var weekday = [
 var month = ["JAN", "FEB", "MAR", "APR", "MAY", "JUNE", "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 class _HomeViewState extends State<HomeView> {
+  late final Future<List<Transaction>> tListTest;
+
   @override
   void initState() {
     super.initState();
@@ -50,7 +51,7 @@ class _HomeViewState extends State<HomeView> {
               top: 8.0,
               left: 24.0,
             ),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               child: Text(
                 "Stats for this month",
@@ -65,7 +66,7 @@ class _HomeViewState extends State<HomeView> {
               top: 8.0,
               left: 24.0,
             ),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               child: Text(
                 "Recent Transactions",
@@ -96,14 +97,14 @@ class _HomeViewState extends State<HomeView> {
                       amount: transaction.amount.value.fold((l) => 'error', (r) => r),
                       title: transaction.category.value.fold((l) => 'error', (r) => r),
                       transactionType: transaction,
-                      note: transaction.note != null ? transaction.note!.value.fold((l) => "error", (r) => r) : null,
+                      note: transaction.note?.value.fold((l) => "error", (r) => r),
                     );
                   },
                   itemCount: min(state.transactions.length, 7)),
             );
           }
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
@@ -121,10 +122,10 @@ class _HomeViewState extends State<HomeView> {
             padding: const EdgeInsets.all(8),
             height: height! * (1 / 4),
             child: Card(
-              color: Color.fromRGBO(72, 108, 124, 0.66),
+              color: const Color.fromRGBO(72, 108, 124, 0.66),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
+                  side: const BorderSide(
                     width: 1.5,
                     color: Colors.white,
                   )),
@@ -174,9 +175,9 @@ class XListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
       child: ListTile(
-        tileColor: Color.fromRGBO(72, 108, 124, 0.05),
+        tileColor: const Color.fromRGBO(72, 108, 124, 0.05),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         leading: Image.asset('assets/common/subscription.png'),
         title: Text(
@@ -189,14 +190,14 @@ class XListTile extends StatelessWidget {
             children: [
               transactionType is IncomeDTO
                   ? Text(
-                      '+ Rs ${amount}',
+                      '+ Rs $amount',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.green),
                     )
                   : Text(
-                      '- Rs ${amount}',
+                      '- Rs $amount',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.red),
                     ),
-              Text("10:00 AM"),
+              const Text("10:00 AM"),
             ],
           ),
         ),

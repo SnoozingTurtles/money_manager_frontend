@@ -6,7 +6,7 @@ abstract class TransactionEvent extends Equatable {
 
 class TransactionInput extends TransactionEvent {
   final List<TransactionDTO> transactionList;
-  TransactionInput({required this.transactionList});
+  const TransactionInput({required this.transactionList});
   @override
   List<Object?> get props => [];
 }

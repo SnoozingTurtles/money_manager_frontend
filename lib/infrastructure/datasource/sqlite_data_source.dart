@@ -89,10 +89,8 @@ class SqliteDataSource implements IDatasource, ILocalUserDataSource {
   Future<int> generateUser() async {
     try {
       int id = await _db.insert('user', {'name': 'User', 'balance': 0, 'expense': 0, 'income': 0, 'loggedIn': 'false'});
-      print("Generated id  is $id");
       return id;
     } catch (e) {
-      print(e);
       return 0;
     }
   }

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:collection';
 
 import 'package:bloc/bloc.dart';
@@ -12,7 +11,8 @@ part 'transaction_event.dart';
 part 'transaction_state.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
-  MapTransactionUseCase _mapTransactionUseCase;
+  final MapTransactionUseCase _mapTransactionUseCase;
+
   TransactionBloc()
       : _mapTransactionUseCase = MapTransactionUseCase(),
         super(TransactionInitial()) {

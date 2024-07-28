@@ -11,6 +11,9 @@ import '../bloc/auth_bloc/form/auth_form_bloc.dart';
 class LoginView extends StatelessWidget {
   static const route = '/LoginView';
 
+  const LoginView({super.key});
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider<AuthFormBloc>(
       create: (context) => AuthFormBloc(),
@@ -21,7 +24,7 @@ class LoginView extends StatelessWidget {
             Navigator.of(context).pushReplacementNamed(DashBoard.route);
           } else if (state is AuthUnauthenticated) {
             BlocProvider.of<UserBloc>(context).add(InitUser());
-            BlocProvider.of<AuthFormBloc>(context).add(Invalidate());
+            BlocProvider.of<AuthFormBloc>(context).add(const Invalidate());
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error),
@@ -76,13 +79,13 @@ class LoginView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 32,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
                           child: XField(
-                              icon_file_name: 'email.png',
+                              iconFileName: 'email.png',
                               validator: (_) {
                                 return state.email.email.fold((l) => l.message, (r) => null);
                               },
@@ -94,7 +97,7 @@ class LoginView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
                           child: XField(
-                              icon_file_name: 'pass.png',
+                              iconFileName: 'pass.png',
                               validator: (_) {
                                 return state.password.password.fold((l) => l.message, (r) => null);
                               },
@@ -103,15 +106,15 @@ class LoginView extends StatelessWidget {
                               },
                               value: "Password"),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
                           child: Align(alignment: Alignment.centerRight, child: Text("Forgot Password?")),
                         ),
                         state.isValid
-                            ? CircularProgressIndicator()
+                            ? const CircularProgressIndicator()
                             : XButton(
                                 onPressed: () {
-                                  BlocProvider.of<AuthFormBloc>(context).add(ValidateSignIn());
+                                  BlocProvider.of<AuthFormBloc>(context).add(const ValidateSignIn());
                                 },
                                 alter: false,
                                 width: MediaQuery.of(context).size.width,

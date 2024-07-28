@@ -48,12 +48,12 @@ class Category extends Equatable implements Comparable<Category> {
 
   @override
   String toString() {
-    return 'cat: ${this.value}';
+    return 'cat: $value';
   }
 
   @override
   int compareTo(Category other) {
     String otherVal = other.value.fold((l) => 'l', (r) => r);
-    return otherVal.compareTo(this.value.fold((l) => '', (r) => r));
+    return otherVal.compareTo(value.fold((l) => '', (r) => r));
   }
 }
